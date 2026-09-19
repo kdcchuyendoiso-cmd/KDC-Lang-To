@@ -798,7 +798,7 @@ def page_home() -> None:
         <div class="hero">
           <div class="hero-mark">🏡</div>
           <div class="hero-title">Khu dân cư Lăng Tô</div>
-          <div class="hero-sub">Thông tin, sự kiện và tiếng nói của bà con trong khu dân cư.</div>
+          <div class="hero-sub">Quản lý & điều hành.</div>
           <div class="chips">
             <a class="chip" href="{link('bang-tin')}" target="_self">📢 {n_news} thông báo</a>
             <a class="chip" href="{link('su-kien')}" target="_self">🎉 {n_events} sự kiện</a>
