@@ -45,14 +45,14 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS ÉP CỨNG CHUẨN 3 NÚT NẰM NGANG KHÍT MÀN HÌNH ĐIỆN THOẠI ---
+# --- CSS ÉP CỨNG GIAO DIỆN FLEXBOX ĐỂ CHẮC CHẮN 3 NÚT 1 HÀNG TRÊN MỌI THIẾT BỊ ---
 st.markdown("""
 <style>
     /* Ép container full màn hình, chống tràn viền */
     .block-container {
-        padding-left: 0.4rem !important;
-        padding-right: 0.4rem !important;
-        padding-top: 0.4rem !important;
+        padding-left: 0.3rem !important;
+        padding-right: 0.3rem !important;
+        padding-top: 0.3rem !important;
         max-width: 100% !important;
     }
 
@@ -93,16 +93,17 @@ st.markdown("""
         opacity: 0.9;
     }
 
-    /* ÉP BẮT BUỘC KHÔNG BỊ XUỐNG DÒNG: 3 NÚT ĐỨNG CÙNG 1 HÀNG NGANG TRÊN ĐIỆN THOẠI */
-    div[data-testid="stHorizontalBlock"] {
+    /* ÉP CỨNG TOÀN BỘ KHỐI CỘT TRONG STREAMLIT THÀNH FLEXBOX NGANG */
+    [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         gap: 4px !important;
         width: 100% !important;
+        margin-bottom: 0px !important;
     }
 
-    div[data-testid="column"] {
+    [data-testid="column"] {
         width: 33.333% !important;
         flex: 1 1 33.333% !important;
         min-width: 33.333% !important;
@@ -110,20 +111,20 @@ st.markdown("""
         padding: 0 !important;
     }
     
-    /* Thiết kế nút bấm dịch vụ: kích thước vừa vặn cho 3 nút trên 1 hàng */
+    /* Thiết kế nút bấm dịch vụ siêu gọn, vừa khít 3 nút 1 hàng */
     .stButton button {
         width: 100% !important;
         background-color: #ffffff;
         color: #1e293b;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
-        padding: 6px 2px !important;
+        padding: 6px 1px !important;
         font-size: 10px !important;
         font-weight: 600;
         box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 4px;
+        margin-bottom: 3px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
