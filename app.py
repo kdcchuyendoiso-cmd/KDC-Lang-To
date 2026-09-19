@@ -45,14 +45,14 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS TỐI ƯU GIAO DIỆN & ÉP CỨNG CHUẨN 3 NÚT TRÊN 1 HÀNG TRÊN MỌI THIẾT BỊ DI ĐỘNG ---
+# --- CSS TỐI ƯU GIAO DIỆN DI ĐỘNG: 3 NÚT 1 HÀNG KHÍT MÀN HÌNH ---
 st.markdown("""
 <style>
-    /* Ép toàn bộ container full màn hình, chống tràn viền */
+    /* Ép toàn bộ container vừa vặn màn hình điện thoại, chống tràn */
     .block-container {
-        padding-left: 0.4rem !important;
-        padding-right: 0.4rem !important;
-        padding-top: 0.4rem !important;
+        padding-left: 0.3rem !important;
+        padding-right: 0.3rem !important;
+        padding-top: 0.3rem !important;
         max-width: 100% !important;
     }
 
@@ -67,7 +67,7 @@ st.markdown("""
         padding: 10px 12px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -93,12 +93,12 @@ st.markdown("""
         opacity: 0.9;
     }
 
-    /* ÉP BẮT BUỘC KHÔNG BỊ XUỐNG DÒNG: 3 CỘT / HÀNG TRÊN ĐIỆN THOẠI */
+    /* ÉP CỨNG CHUẨN 3 CỘT / HÀNG NGANG TRÊN MỌI THIẾT BỊ DI ĐỘNG */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 3px !important;
+        gap: 2px !important;
         width: 100% !important;
     }
 
@@ -110,20 +110,20 @@ st.markdown("""
         padding: 0 1px !important;
     }
     
-    /* Thiết kế nút bấm dịch vụ dạng thẻ bo tròn cân đối, chữ nhỏ gọn vừa khít 3 nút 1 hàng */
+    /* Thiết kế nút bấm dịch vụ: thu gọn padding để vừa khít 3 nút trên màn hình dọc */
     .stButton button {
         width: 100% !important;
         background-color: #ffffff;
         color: #1e293b;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #cbd5e1;
         border-radius: 8px;
-        padding: 6px 1px;
-        font-size: 10px;
+        padding: 5px 1px !important;
+        font-size: 9.5px !important;
         font-weight: 600;
         box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 3px;
+        margin-bottom: 2px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -140,24 +140,28 @@ st.markdown("""
         color: #334155 !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 6px !important;
-        font-size: 10px !important;
-        padding: 2px 8px !important;
+        font-size: 9.5px !important;
+        padding: 2px 6px !important;
         font-weight: 600 !important;
         width: auto !important;
         margin: 0 !important;
     }
 
     .nav-title-text {
-        font-size: 12px !important;
+        font-size: 11.5px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
         margin: 0 !important;
         text-align: right;
     }
 
-    /* NỘI DUNG VÀ BẢNG DỮ LIỆU: CHUẨN 10.5px GỌN GÀNG KHÍT MÀN HÌNH */
+    /* NỘI DUNG VÀ BẢNG DỮ LIỆU: TIÊU ĐỀ 12px, NỘI DUNG 11px */
+    h1 {
+        font-size: 12px !important;
+    }
+    
     [data-testid="stDataFrame"] div, [data-testid="stDataEditor"] div, p, span, label, .streamlit-expanderHeader {
-        font-size: 10.5px !important;
+        font-size: 11px !important;
     }
     
     table {
@@ -165,7 +169,7 @@ st.markdown("""
     }
     
     input, select, textarea {
-        font-size: 10.5px !important;
+        font-size: 11px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -305,7 +309,7 @@ if st.session_state.current_page != "Trang Chủ":
         st.markdown('</div>', unsafe_allow_html=True)
     with col_nav_title:
         st.markdown(f'<p class="nav-title-text">{current_title}</p>', unsafe_allow_html=True)
-    st.markdown("<hr style='margin: 4px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 # ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
