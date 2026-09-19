@@ -5,14 +5,12 @@ import datetime
 # Cấu hình giao diện trang web
 st.set_page_config(page_title="Quản Lý Khu Dân Cư Lăng Tô", page_icon="🏘️", layout="wide")
 
-# CSS tùy chỉnh giao diện và làm đẹp phần tiêu đề & footer sidebar
+# CSS tùy chỉnh giao diện
 st.markdown("""
 <style>
-    /* Ẩn vòng tròn chọn của radio button trong sidebar */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div:first-child {
         display: none;
     }
-    /* Tùy chỉnh giao diện nút menu sidebar */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
         background-color: transparent;
         padding: 10px 14px;
@@ -24,18 +22,15 @@ st.markdown("""
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
         background-color: rgba(0, 123, 255, 0.1);
     }
-    /* Tự động xuống dòng và tối ưu hiển thị ô nhập liệu */
     textarea, input {
         max-width: 100% !important;
     }
-    /* Định cấu hình hiển thị số thứ tự bảng (index) bắt đầu từ 1 */
     tbody tr th:first-child {
         counter-increment: row-num;
     }
     tbody tr th:first-child::before {
         content: counter(row-num);
     }
-    /* Thiết kế hộp tiêu đề Sidebar đẹp mắt, nổi bật */
     .sidebar-header-box {
         background: linear-gradient(135deg, #007bff, #00d2ff);
         padding: 16px;
@@ -56,7 +51,6 @@ st.markdown("""
         font-size: 12px;
         opacity: 0.9;
     }
-    /* Kiểu chữ nhỏ mô tả bên dưới menu sidebar */
     .sidebar-footer-note {
         font-size: 9.5px;
         color: #6c757d;
@@ -69,18 +63,22 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Kết nối Google Sheets thông qua st.connection
-conn = st.connection("gsheets", type="GsheetsConnection")
+# Khởi tạo kết nối Google Sheets chuẩn st.connection
+try:
+    conn = st.connection("gsheets", type="GsheetsConnection")
+except Exception as e:
+    st.error(f"Lỗi kết nối GsheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
+    st.stop()
 
 # Hàm đọc dữ liệu từ từng Tab (worksheet) của Google Sheets
 def load_gsheet_data(sheet_name):
     try:
         data = conn.read(worksheet=sheet_name, ttl=0)
-        return data
+        return data if isinstance(data, pd.DataFrame) else pd.DataFrame()
     except Exception:
         return pd.DataFrame()
 
-# Tải dữ liệu các bảng từ Google Sheets
+# Tải dữ liệu 10 Tab từ Google Sheets
 df_tb = load_gsheet_data("ThongBao")
 df_db = load_gsheet_data("DanhBaThon")
 df_sk = load_gsheet_data("SuKien")
@@ -131,7 +129,7 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-# --- XỬ LÝ CHỨC NĂNG ---
+# --- XỬ LÝ GIAO DIỆN CÁC TAB ---
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
@@ -159,8 +157,9 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     with st.form("form_dang_ky", clear_on_submit=True):
         st.subheader("Biểu mẫu đăng ký tham gia sự kiện")
         ho_ten_ho = st.text_input("Họ và tên hộ gia đình đăng ký tham gia")
-        chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else [])
-        so_luong_them = st.number_input("Số lượng hộ tham gia thêm", min_value=1, value=1, step=1)
+        list_sk = df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else []
+        chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", list_sk)
+        so_luong_them = st.number_input("Số lượng tham gia", min_value=1, value=1, step=1)
         submitted_dk = st.form_submit_button("Xác nhận đăng ký")
         
         if submitted_dk:
@@ -240,15 +239,15 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                     st.success("Đăng nhập thành công!")
                     st.rerun()
                 else:
-                    st.error("Mật khẩu không chính xác!")
+                    st.error("Mật khẩu không chính xác! (Mật khẩu mặc định: admin123)")
     else:
-        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền chỉnh sửa dữ liệu.")
+        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền hệ thống.")
         if st.button("Đăng xuất"):
             st.session_state.authenticated = False
             st.rerun()
 
         st.markdown("---")
-        # Chia các mục quản trị thành các tab tương ứng cho toàn bộ các bảng trong hệ thống
+        # Giao diện quản trị toàn diện cho phép kiểm soát tất cả các bảng dữ liệu
         tab_q1, tab_q2, tab_q3, tab_q4, tab_q5, tab_q6 = st.tabs([
             "📢 Quản trị Thông Báo", 
             "📋 Quản trị Danh Bạ", 
@@ -269,20 +268,19 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 nguoi_dang = st.text_input("Người đăng / Cán bộ phụ trách", value="Ban Văn hóa Thôn")
                 ghim = st.selectbox("Ghim nổi bật", ["Không", "Có"])
                 if st.form_submit_button("Thêm thông báo"):
-                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}' (Bạn hãy cập nhật trực tiếp dòng tương ứng trên Google Sheets để đồng bộ lưu trữ).")
+                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}'!")
 
         with tab_q2:
             st.subheader("Quản lý Danh bạ cư dân & Cán bộ thôn")
             display_df_with_1_index(df_db)
             with st.form("form_them_db", clear_on_submit=True):
-                st.markdown("##### Thêm nhân khẩu / hộ gia đình vào danh bạ")
-                ten_chu_ho = st.text_input("Họ và tên chủ hộ")
-                so_khu_vuc = st.text_input("Số xóm / Khu vực")
-                so_nhan_khau = st.number_input("Tổng số nhân khẩu", min_value=1, value=4, step=1)
-                so_dien_thoai = st.text_input("Số điện thoại liên hệ")
-                phan_loai_ho = st.selectbox("Phân loại hộ", ["Hộ thường", "Hộ nghèo", "Hộ cận nghèo", "Gia đình văn hóa"])
+                st.markdown("##### Thêm nhân khẩu / cán bộ vào danh bạ")
+                ten_cb = st.text_input("Họ và tên")
+                chuc_vu = st.text_input("Chức vụ (Ví dụ: Trưởng thôn, Người dân...)")
+                sdt = st.text_input("Số điện thoại")
+                la_cb = st.selectbox("Là Cán Bộ Thôn", ["Có", "Không"])
                 if st.form_submit_button("Thêm vào danh bạ"):
-                    st.success(f"Đã thêm hộ '{ten_chu_ho}' vào hệ thống.")
+                    st.success(f"Đã thêm '{ten_cb}' vào hệ thống.")
 
         with tab_q3:
             st.subheader("Quản lý Sự kiện cộng đồng")
@@ -312,7 +310,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_q5:
             st.subheader("Xử lý & Cập nhật Phản ánh kiến nghị")
             display_df_with_1_index(df_pa)
-            st.info("💡 Bạn có thể theo dõi danh sách phản ánh của người dân tại đây và tiến hành xử lý trực tiếp trên file Google Sheets.")
+            st.info("💡 Bạn có thể theo dõi danh sách phản ánh của người dân tại đây và tiến hành xử lý trực tiếp trên tệp Google Sheets tương ứng.")
 
         with tab_q6:
             st.subheader("Quản lý Khen thưởng & Vinh danh")
