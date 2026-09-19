@@ -163,6 +163,7 @@ def page_header(page: Page) -> None:
 
 
 def bottom_nav(active: str) -> None:
+return
     items = [("home", "🏠", "Trang chủ")] + [(s, PAGES[s].icon, PAGES[s].short) for s in NAV_SLUGS]
     parts = []
     for slug, icon, label in items:
