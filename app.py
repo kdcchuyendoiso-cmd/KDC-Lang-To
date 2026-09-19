@@ -6,14 +6,12 @@ from streamlit_gsheets import GSheetsConnection
 # Cấu hình giao diện trang web
 st.set_page_config(page_title="Quản Lý Khu Dân Cư Lăng Tô", page_icon="🏘️", layout="wide")
 
-# CSS tùy chỉnh giao diện và làm đẹp phần tiêu đề & footer sidebar
+# CSS tùy chỉnh giao diện
 st.markdown("""
 <style>
-    /* Ẩn vòng tròn chọn của radio button trong sidebar */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div:first-child {
         display: none;
     }
-    /* Tùy chỉnh giao diện nút menu sidebar */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
         background-color: transparent;
         padding: 10px 14px;
@@ -25,11 +23,9 @@ st.markdown("""
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
         background-color: rgba(0, 123, 255, 0.1);
     }
-    /* Tự động xuống dòng và tối ưu hiển thị ô nhập liệu */
     textarea, input {
         max-width: 100% !important;
     }
-    /* Thiết kế hộp tiêu đề Sidebar đẹp mắt, nổi bật */
     .sidebar-header-box {
         background: linear-gradient(135deg, #007bff, #00d2ff);
         padding: 16px;
@@ -50,7 +46,6 @@ st.markdown("""
         font-size: 12px;
         opacity: 0.9;
     }
-    /* Kiểu chữ nhỏ mô tả bên dưới menu sidebar */
     .sidebar-footer-note {
         font-size: 9.5px;
         color: #6c757d;
@@ -63,14 +58,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Kết nối Google Sheets thông qua st.connection chuẩn GSheetsConnection
+# Kết nối Google Sheets
 try:
     conn = st.connection("gsheets", type=GSheetsConnection)
 except Exception as e:
     st.error(f"Lỗi kết nối GSheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
     st.stop()
 
-# Hàm đọc dữ liệu có bắt lỗi chi tiết để phát hiện sai tên Tab
+# Hàm đọc dữ liệu an toàn
 def load_gsheet_data(sheet_name):
     try:
         data = conn.read(worksheet=sheet_name, ttl=0)
@@ -78,7 +73,7 @@ def load_gsheet_data(sheet_name):
             return pd.DataFrame()
         return data.dropna(how="all")
     except Exception as e:
-        st.warning(f"⚠️ Không tìm thấy Tab có tên là **'{sheet_name}'** trong Google Sheets. Vui lòng kiểm tra lại tên Tab (Có thể do viết hoa, viết thường, có dấu tiếng Việt hoặc khoảng trắng). Chi tiết lỗi: {e}")
+        st.warning(f"⚠️ Không đọc được Tab **'{sheet_name}'** từ Google Sheets. Chi tiết lỗi: {e}")
         return pd.DataFrame()
 
 def display_df_with_1_index(df):
@@ -124,7 +119,7 @@ st.sidebar.markdown("---")
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
-    df_tb = load_gsheet_data("ThongBao")
+    df_tb = load_gsheet_data("Thongbao")  # Khớp chính xác tên tab Thongbao
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
             ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
@@ -132,7 +127,7 @@ if "1. 📢 Bảng Tin & Thông Báo" in choice:
                 st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
                 st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
     else:
-        st.info("Chưa có thông báo nào hoặc không kết nối được bảng ThongBao.")
+        st.info("Chưa có thông báo nào hoặc không kết nối được bảng Thongbao.")
 
 elif "2. 📋 Danh Bạ Thôn" in choice:
     st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
@@ -153,14 +148,15 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
         st.subheader("Biểu mẫu đăng ký tham gia sự kiện")
         ho_ten_ho = st.text_input("Họ và tên hộ gia đình đăng ký tham gia")
         chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else [])
-        so_luong_them = st.number_input("Số lượng hộ tham gia thêm", min_value=1, value=1, step=1)
+        so_luong_them = st.number_input("Số lượng tham gia", min_value=1, value=1, step=1)
+        ghi_chu_dk = st.text_input("Ghi chú")
         submitted_dk = st.form_submit_button("Xác nhận đăng ký")
         
         if submitted_dk:
             if not ho_ten_ho.strip():
                 st.warning("Vui lòng nhập họ và tên hộ gia đình đăng ký!")
             else:
-                st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký sự kiện thành công.")
+                st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký sự kiện thành công. (Vui lòng cập nhật dòng mới này trực tiếp vào Google Sheets tab 'DangKySuKien').")
 
 elif "5. 💰 Công Khai Thu Chi" in choice:
     st.header("💰 Công Khai Tài Chính Quỹ Thôn")
@@ -169,6 +165,7 @@ elif "5. 💰 Công Khai Thu Chi" in choice:
 
 elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
     st.header("⚠️ Gửi Phản Ánh & Kiến Nghị Đến Cán Bộ Thôn")
+    df_pa = load_gsheet_data("PhanAnh")
     with st.form("form_phan_anh", clear_on_submit=True):
         nguoi_gui = st.text_input("Họ và tên của bạn")
         linh_vuc_pa = st.selectbox("Lĩnh vực phản ánh", ["Môi trường", "An ninh trật tự", "Hạ tầng / Đường xá", "Tranh chấp", "Khác"])
@@ -179,7 +176,7 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
             if not nguoi_gui.strip() or not noi_dung_pa.strip():
                 st.warning("Vui lòng nhập đầy đủ họ tên và nội dung phản ánh!")
             else:
-                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công.")
+                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công. (Vui lòng ghi nhận thêm dòng vào Google Sheets tab 'PhanAnh').")
 
 elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
     st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân Tiêu Biểu")
@@ -204,7 +201,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                 if not ten_sp.strip() or not sdt_lh.strip():
                     st.warning("Vui lòng điền tên sản phẩm và số điện thoại liên hệ!")
                 else:
-                    st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công!")
+                    st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công! (Vui lòng bổ sung dòng vào Google Sheets tab 'ChoQue').")
 
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
@@ -220,7 +217,7 @@ elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
             if not ho_ten_dl.strip():
                 st.warning("Vui lòng nhập họ và tên người đăng ký!")
             else:
-                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} đã được ghi nhận.")
+                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} đã được ghi nhận. (Cập nhật trực tiếp dòng vào tab 'DatLichNhaVanHoa').")
 
 elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
     st.header("🔐 Đăng Nhập Khu Vực Quản Trị Cán Bộ Thôn")
@@ -246,8 +243,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
 
         st.markdown("---")
         
-        # Tải dữ liệu các bảng phục vụ khu vực quản trị
-        df_tb = load_gsheet_data("ThongBao")
+        df_tb = load_gsheet_data("Thongbao")
         df_db = load_gsheet_data("DanhBaThon")
         df_sk = load_gsheet_data("SuKien")
         df_tc = load_gsheet_data("CongKhaiThuChi")
@@ -274,20 +270,19 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 nguoi_dang = st.text_input("Người đăng / Cán bộ phụ trách", value="Ban Văn hóa Thôn")
                 ghim = st.selectbox("Ghim nổi bật", ["Không", "Có"])
                 if st.form_submit_button("Thêm thông báo"):
-                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}' (Bạn hãy cập nhật trực tiếp dòng tương ứng trên Google Sheets để đồng bộ lưu trữ).")
+                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}' (Bạn hãy cập nhật trực tiếp dòng tương ứng trên Google Sheets tab 'Thongbao').")
 
         with tab_q2:
             st.subheader("Quản lý Danh bạ cư dân & Cán bộ thôn")
             display_df_with_1_index(df_db)
             with st.form("form_them_db", clear_on_submit=True):
-                st.markdown("##### Thêm nhân khẩu / hộ gia đình vào danh bạ")
-                ten_chu_ho = st.text_input("Họ và tên chủ hộ")
-                so_khu_vuc = st.text_input("Số xóm / Khu vực")
-                so_nhan_khau = st.number_input("Tổng số nhân khẩu", min_value=1, value=4, step=1)
-                so_dien_thoai = st.text_input("Số điện thoại liên hệ")
-                phan_loai_ho = st.selectbox("Phân loại hộ", ["Hộ thường", "Hộ nghèo", "Hộ cận nghèo", "Gia đình văn hóa"])
+                st.markdown("##### Thêm nhân khẩu / cán bộ mới")
+                ho_ten = st.text_input("Họ và Tên")
+                chuc_vu = st.text_input("Chức Vụ (nếu có)")
+                sdt = st.text_input("Số Điện Thoại")
+                 la_can_bo = st.selectbox("Là Cán Bộ Thôn", ["Không", "Có"])
                 if st.form_submit_button("Thêm vào danh bạ"):
-                    st.success(f"Đã thêm hộ '{ten_chu_ho}' vào hệ thống.")
+                    st.success(f"Đã thêm '{ho_ten}' vào danh bạ.")
 
         with tab_q3:
             st.subheader("Quản lý Sự kiện cộng đồng")
