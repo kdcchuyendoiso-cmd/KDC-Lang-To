@@ -119,7 +119,7 @@ st.sidebar.markdown("---")
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
-    df_tb = load_gsheet_data("Thongbao")  # Khớp chính xác tên tab Thongbao
+    df_tb = load_gsheet_data("Thongbao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
             ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
@@ -156,7 +156,7 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
             if not ho_ten_ho.strip():
                 st.warning("Vui lòng nhập họ và tên hộ gia đình đăng ký!")
             else:
-                st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký sự kiện thành công. (Vui lòng cập nhật dòng mới này trực tiếp vào Google Sheets tab 'DangKySuKien').")
+                st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký sự kiện thành công.")
 
 elif "5. 💰 Công Khai Thu Chi" in choice:
     st.header("💰 Công Khai Tài Chính Quỹ Thôn")
@@ -176,7 +176,7 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
             if not nguoi_gui.strip() or not noi_dung_pa.strip():
                 st.warning("Vui lòng nhập đầy đủ họ tên và nội dung phản ánh!")
             else:
-                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công. (Vui lòng ghi nhận thêm dòng vào Google Sheets tab 'PhanAnh').")
+                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công.")
 
 elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
     st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân Tiêu Biểu")
@@ -201,7 +201,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                 if not ten_sp.strip() or not sdt_lh.strip():
                     st.warning("Vui lòng điền tên sản phẩm và số điện thoại liên hệ!")
                 else:
-                    st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công! (Vui lòng bổ sung dòng vào Google Sheets tab 'ChoQue').")
+                    st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công!")
 
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
@@ -217,7 +217,7 @@ elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
             if not ho_ten_dl.strip():
                 st.warning("Vui lòng nhập họ và tên người đăng ký!")
             else:
-                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} đã được ghi nhận. (Cập nhật trực tiếp dòng vào tab 'DatLichNhaVanHoa').")
+                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} đã được ghi nhận.")
 
 elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
     st.header("🔐 Đăng Nhập Khu Vực Quản Trị Cán Bộ Thôn")
@@ -270,7 +270,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 nguoi_dang = st.text_input("Người đăng / Cán bộ phụ trách", value="Ban Văn hóa Thôn")
                 ghim = st.selectbox("Ghim nổi bật", ["Không", "Có"])
                 if st.form_submit_button("Thêm thông báo"):
-                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}' (Bạn hãy cập nhật trực tiếp dòng tương ứng trên Google Sheets tab 'Thongbao').")
+                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}'")
 
         with tab_q2:
             st.subheader("Quản lý Danh bạ cư dân & Cán bộ thôn")
@@ -280,7 +280,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 ho_ten = st.text_input("Họ và Tên")
                 chuc_vu = st.text_input("Chức Vụ (nếu có)")
                 sdt = st.text_input("Số Điện Thoại")
-                 la_can_bo = st.selectbox("Là Cán Bộ Thôn", ["Không", "Có"])
+                la_can_bo = st.selectbox("Là Cán Bộ Thôn", ["Không", "Có"])
                 if st.form_submit_button("Thêm vào danh bạ"):
                     st.success(f"Đã thêm '{ho_ten}' vào danh bạ.")
 
