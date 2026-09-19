@@ -45,74 +45,74 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS GIAO DIỆN TỐI ƯU MOBILE & TÙY CHỈNH KÍCH THƯỚC NỘI DUNG ---
+# --- CSS TỐI ƯU GIAO DIỆN CHUYÊN NGHIỆP (3 CỘT ĐỐI XỨNG & FONT CHUẨN MOBILE) ---
 st.markdown("""
 <style>
-    /* Ép bố cục Streamlit tối ưu chiều rộng màn hình điện thoại */
+    /* Ép toàn bộ container full màn hình, chống tràn viền */
     .block-container {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-        padding-top: 1rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        padding-top: 0.75rem !important;
         max-width: 100% !important;
     }
 
-    /* Tổng thể nền trang */
     .stApp {
         background-color: #f8fafc;
     }
     
-    /* Banner sang trọng màu xanh dương đậm (Professional Blue) + Bo tròn + Biểu tượng khu dân cư */
+    /* Banner xanh dương chuyên nghiệp, bo tròn các góc */
     .app-banner {
         background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
-        padding: 14px 16px;
-        border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.25);
-        margin-bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        margin-bottom: 12px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
     }
     .banner-icon {
-        font-size: 32px;
+        font-size: 28px;
         background: rgba(255, 255, 255, 0.2);
-        padding: 8px 12px;
-        border-radius: 12px;
+        padding: 6px 10px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .banner-text h3 {
         margin: 0;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
     }
     .banner-text p {
         margin: 2px 0 0 0;
-        font-size: 11.5px;
+        font-size: 11px;
         opacity: 0.9;
     }
 
-    /* Cố định 3 cột dịch vụ trên mọi màn hình */
-    [data-testid="column"] {
-        width: calc(33.333% - 0.4rem) !important;
-        flex: 1 1 calc(33.333% - 0.4rem) !important;
-        min-width: calc(33.333% - 0.4rem) !important;
+    /* ÉP BẮT BUỘC CÁC CỘT TRONG STREAMLIT CHIA ĐỀU 3 CỘT / HÀNG TRÊN MỌI THIẾT BỊ */
+    div[data-testid="column"] {
+        width: 33.3333% !important;
+        flex: 1 1 33.3333% !important;
+        min-width: 33.3333% !important;
+        max-width: 33.3333% !important;
         padding: 0 2px !important;
     }
     
-    /* Nút bấm dịch vụ dạng thẻ bo tròn gọn gàng */
+    /* Thiết kế nút bấm dịch vụ dạng thẻ bo tròn cân đối */
     .stButton button {
         width: 100% !important;
-        background-color: white;
+        background-color: #ffffff;
         color: #1e293b;
         border: 1px solid #e2e8f0;
-        border-radius: 18px;
+        border-radius: 12px;
         padding: 8px 2px;
         font-size: 11px;
         font-weight: 600;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
         margin-bottom: 4px;
@@ -124,37 +124,36 @@ st.markdown("""
     .stButton button:hover {
         border-color: #3b82f6;
         color: #3b82f6;
-        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15);
     }
 
-    /* Tinh chỉnh nút Quay lại Trang chủ nhỏ gọn, tinh tế, không bị che lấp */
+    /* Nút Quay lại Trang chủ cực kỳ nhỏ gọn, sát lề trên, không che lấp nội dung */
     div[data-testid="stButton"] > button[kind="secondary"] {
         background-color: #f1f5f9 !important;
         color: #475569 !important;
         border: 1px solid #cbd5e1 !important;
-        border-radius: 12px !important;
-        font-size: 11px !important;
-        padding: 4px 10px !important;
+        border-radius: 8px !important;
+        font-size: 10.5px !important;
+        padding: 2px 8px !important;
         font-weight: 500 !important;
         width: auto !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 4px !important;
     }
 
-    /* TIÊU ĐỀ CÁC TRANG SAU: CHUẨN 12px */
+    /* TIÊU ĐỀ TRANG SAU: CHUẨN 12px */
     h1 {
-        font-size: 16px !important;
+        font-size: 14px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
-        padding-bottom: 4px !important;
-        margin-bottom: 10px !important;
+        padding-bottom: 2px !important;
+        margin-bottom: 8px !important;
     }
     h2, h3 {
-        font-size: 13px !important;
+        font-size: 12px !important;
         font-weight: 600 !important;
         color: #334155 !important;
     }
 
-    /* NỘI DUNG VÀ BẢNG DỮ LIỆU TRANG SAU: CHUẨN 11px, FULL MÀN HÌNH */
+    /* NỘI DUNG VÀ BẢNG DỮ LIỆU: CHUẨN 11px GỌN GÀNG KHÍT MÀN HÌNH */
     [data-testid="stDataFrame"] div, [data-testid="stDataEditor"] div, p, span, label, .streamlit-expanderHeader {
         font-size: 11px !important;
     }
@@ -163,7 +162,6 @@ st.markdown("""
         width: 100% !important;
     }
     
-    /* Chỉnh kích thước ô nhập liệu form form-input vừa vặn trên điện thoại */
     input, select, textarea {
         font-size: 11px !important;
     }
@@ -296,12 +294,12 @@ if st.session_state.current_page == "Trang Chủ":
             <div class="banner-icon">🏡</div>
             <div class="banner-text">
                 <h3>KHU DÂN CƯ LĂNG TÔ</h3>
-                <p>Cổng Thông Tin Quản Lý Cộng Đồng Thông Minh</p>
+                <p>Cổng Thông Tin Quản Lý Cộng Đồng</p>
             </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # --- DANH SÁCH NÚT DỊCH VỤ (3 CỘT / HÀNG TRÊN MOBILE) ---
+    # --- DANH SÁCH NÚT DỊCH VỤ (LUÔN ĐẢM BẢO CHÍNH XÁC 3 CỘT / HÀNG) ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
