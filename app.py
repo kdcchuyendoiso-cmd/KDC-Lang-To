@@ -4,11 +4,11 @@ import datetime
 import os
 import openpyxl
 
-# --- CẤU HÌNH TRANG WEB (TỐI ƯU MOBILE & RESPONSIVE) ---
+# --- CẤU HÌNH TRANG WEB (TỐI ƯU MOBILE APP STYLE) ---
 st.set_page_config(
     page_title="Quản Lý Khu Dân Cư Lăng Tô", 
     page_icon="🏘️", 
-    layout="centered" # Chuyển về chế độ centered để tối ưu trên màn hình điện thoại
+    layout="centered"
 )
 
 # --- TÊN FILE EXCEL TRÊN GITHUB ---
@@ -45,102 +45,97 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS TÙY CHỈNH GIAO DIỆN (TỐI ƯU CHO ĐIỆN THOẠI & HIỆU ỨNG MƯỢT MÀ) ---
+# --- CSS TÙY CHỈNH BIẾN STREAMLIT THÀNH ỨNG DỤNG DI ĐỘNG CHUẨN ---
 st.markdown("""
 <style>
-    /* Tổng thể font chữ và màu sắc cho di động */
-    html, body, [class*="css"] {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    
-    /* Ẩn dấu chấm radio mặc định của streamlit, làm thành dạng nút bấm phẳng */
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div:first-child {
+    /* Ẩn sidebar mặc định của Streamlit để giao diện rộng rãi, gọn gàng tuyệt đối trên điện thoại */
+    [data-testid="stSidebar"] {
         display: none;
     }
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-        background-color: #f8f9fa;
-        padding: 12px 16px;
-        border-radius: 10px;
-        margin-bottom: 8px;
-        border: 1px solid #e9ecef;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        cursor: pointer;
-        width: 100%;
-    }
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
-        background-color: #007bff;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
-    }
     
-    /* Hộp tiêu đề sidebar */
-    .sidebar-header-box {
-        background: linear-gradient(135deg, #007bff, #00d2ff);
-        padding: 18px;
-        border-radius: 14px;
-        text-align: center;
-        color: white;
-        margin-bottom: 20px;
-        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.25);
-    }
-    .sidebar-header-box h2 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 700;
-    }
-    .sidebar-header-box p {
-        margin: 6px 0 0 0;
-        font-size: 11px;
-        opacity: 0.95;
+    /* Thiết lập font chữ và màu nền app sạch sẽ */
+    html, body, [class*="css"] {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f4f6f9;
     }
 
-    /* Thẻ card tùy chỉnh cho điện thoại với hiệu ứng chuyển động */
+    /* Tiêu đề ứng dụng kiểu App Header */
+    .app-header {
+        background: linear-gradient(135deg, #007bff, #00d2ff);
+        padding: 20px;
+        border-radius: 0 0 20px 20px;
+        text-align: center;
+        color: white;
+        margin: -1rem -1rem 1.5rem -1rem;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
+    .app-header h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+    }
+    .app-header p {
+        margin: 5px 0 0 0;
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    /* Thẻ Card nội dung có hiệu ứng chuyển động mượt mà khi chạm */
     .mobile-card {
         background: white;
-        padding: 16px;
+        padding: 14px 16px;
         border-radius: 12px;
         border: 1px solid #e2e8f0;
-        margin-bottom: 12px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        transition: all 0.2s ease;
     }
     .mobile-card:active {
         transform: scale(0.98);
-    }
-    .mobile-card h4 {
-        margin-top: 0;
-        color: #1e293b;
-        font-size: 16px;
-    }
-    
-    /* Hiệu ứng mượt mà khi bấm mở expander */
-    .streamlit-expanderHeader {
-        background-color: #f8fafc !important;
-        border-radius: 8px !important;
-        transition: background-color 0.3s ease !important;
-    }
-    .streamlit-expanderHeader:hover {
-        background-color: #edf2f7 !important;
+        background-color: #f8fafc;
     }
 
-    /* Nút bấm (Buttons) to rõ, dễ chạm bằng ngón tay */
+    /* Tùy chỉnh các Expander (nội dung bấm vào mở rộng trượt mượt) */
+    .streamlit-expanderHeader {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        transition: all 0.3s ease !important;
+        padding: 10px 14px !important;
+        margin-bottom: 8px !important;
+    }
+    .streamlit-expanderHeader:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    /* Nút bấm (Buttons) to rõ, bo tròn dễ bấm bằng ngón tay */
     .stButton>button {
         width: 100% !important;
         border-radius: 10px !important;
         padding: 10px 16px !important;
         font-weight: 600 !important;
-        transition: all 0.2s ease;
+        background-color: #007bff !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        transition: transform 0.1s ease;
     }
-    
-    .sidebar-footer-note {
-        font-size: 9px;
+    .stButton>button:active {
+        transform: scale(0.96);
+    }
+
+    /* Chân trang ứng dụng */
+    .app-footer {
+        font-size: 10px;
         color: #64748b;
-        text-align: justify;
+        text-align: center;
+        padding: 20px 10px;
         line-height: 1.4;
-        padding: 10px 4px;
-        margin-top: 10px;
         border-top: 1px dashed #cbd5e1;
+        margin-top: 30px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -229,15 +224,15 @@ def save_row_to_excel(sheet_name, new_data_dict):
         st.error(f"Lỗi khi thêm dữ liệu: {e}")
         return False
 
-# Hàm hiển thị dữ liệu dạng thẻ (Card list) cực kỳ thân thiện với di động, bấm vào mở rộng xem chi tiết
+# Hàm hiển thị dữ liệu dạng Thẻ (Cards) mở rộng cực mượt trên điện thoại
 def display_mobile_cards(df, title_col, details_cols):
     df_clean = clean_dataframe(df, "")
     if df_clean.empty:
-        st.info("💡 Hiện chưa có dữ liệu nào.")
+        st.info("💡 Hiện chưa có dữ liệu nào trong mục này.")
         return
 
     for idx, row in df_clean.iterrows():
-        title_val = row.get(title_col, 'Thông tin chi tiết')
+        title_val = row.get(title_col, 'Chi tiết')
         with st.expander(f"📌 {title_val}"):
             for col in details_cols:
                 val = row.get(col, '')
@@ -273,63 +268,75 @@ def get_updated_events_df():
                 df_sk_calc.loc[idx, 'Tổng Số Hộ Tham Gia'] = '0'
     return df_sk_calc
 
-# --- THANH BÊN (SIDEBAR) ---
-with st.sidebar:
-    st.markdown("""
-        <div class="sidebar-header-box">
-            <h2>🏘️ Lăng Tô Mobile</h2>
-            <p>Hệ thống Quản lý Cộng đồng</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-modules = [
-    "1. 📢 Bảng Tin & Thông Báo",
-    "2. 📋 Danh Bạ Thôn",
-    "3. 🎉 Sự Kiện Cộng Đồng",
-    "4. 📝 Đăng Ký & Điểm Danh",
-    "5. 💰 Công Khai Thu Chi",
-    "6. ⚠️ Phản Ánh & Kiến Nghị",
-    "7. 🏆 Vinh Danh & Khen Thưởng",
-    "8. 🛒 Chợ Quê Nông Sản",
-    "9. 📅 Đặt Lịch Nhà Văn Hóa",
-    "10. 🛠️ Khu Vực Quản Trị Cán Bộ"
-]
-
-choice = st.sidebar.radio("📌 Chọn Chức Năng", modules, label_visibility="collapsed")
-
-st.sidebar.markdown("""
-    <div class="sidebar-footer-note">
-        Chương trình mục tiêu quốc gia xây dựng nông thôn mới, giảm nghèo bền vững và phát triển kinh tế - xã hội vùng đồng bào dân tộc thiểu số và miền núi.
+# --- GIAO DIỆN APP HEADER ---
+st.markdown("""
+    <div class="app-header">
+        <h1>🏘️ Quản Lý Khu Dân Cư Lăng Tô</h1>
+        <p>Ứng dụng số hóa cộng đồng thông minh</p>
     </div>
 """, unsafe_allow_html=True)
-st.sidebar.markdown("---")
 
-# --- XỬ LÝ GIAO DIỆN CÁC CHỨC NĂNG ---
+# --- QUẢN LÝ TRẠNG THÁI CHUYỂN TAB TRÊN MOBILE ---
+if "active_tab" not in st.session_state:
+    st.session_state.active_tab = "Trang chủ"
 
-if "1. 📢 Bảng Tin & Thông Báo" in choice:
+# Nút quay lại trang chủ nếu đang ở màn hình khác
+if st.session_state.active_tab != "Trang chủ":
+    if st.button("⬅️ Quay lại Menu chính"):
+        st.session_state.active_tab = "Trang chủ"
+        st.rerun()
+
+# --- MÀN HÌNH CHÍNH (MENU LƯỚI 2 CỘT GỌN GÀNG NHƯ APP CHUẨN) ---
+if st.session_state.active_tab == "Trang chủ":
+    st.markdown("### 📱 Chọn chức năng cần sử dụng:")
+    
+    col1, col2 = st.columns(2)
+    
+    menu_items = [
+        ("📢 Bảng Tin", "1. 📢 Bảng Tin & Thông Báo"),
+        ("📋 Danh Bạ", "2. 📋 Danh Bạ Thôn"),
+        ("🎉 Sự Kiện", "3. 🎉 Sự Kiện Cộng Đồng"),
+        ("📝 Đăng Ký", "4. 📝 Đăng Ký & Điểm Danh"),
+        ("💰 Thu Chi", "5. 💰 Công Khai Thu Chi"),
+        ("⚠️ Phản Ánh", "6. ⚠️ Phản Ánh & Kiến Nghị"),
+        ("🏆 Vinh Danh", "7. 🏆 Vinh Danh & Khen Thưởng"),
+        ("🛒 Chợ Quê", "8. 🛒 Chợ Quê Nông Sản"),
+        ("📅 Đặt Lịch", "9. 📅 Đặt Lịch Nhà Văn Hóa"),
+        ("🔐 Quản Trị", "10. 🛠️ Khu Vực Quản Trị Cán Bộ")
+    ]
+    
+    for i, (title, key) in enumerate(menu_items):
+        with (col1 if i % 2 == 0 else col2):
+            if st.button(title, key=f"btn_menu_{i}"):
+                st.session_state.active_tab = key
+                st.rerun()
+
+# --- XỬ LÝ NỘI DUNG KHI NGƯỜI DÙNG BẤM CHỌN ---
+
+elif st.session_state.active_tab == "1. 📢 Bảng Tin & Thông Báo":
     st.markdown("### 📢 Bảng Tin & Thông Báo")
     df_tb = load_excel_data("ThongBao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
             ghim = "🔥 [Nổi bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
             with st.expander(f"{ghim} {row.get('Tiêu Đề', 'Thông báo')} ({row.get('Phân Loại', 'Chung')})"):
-                st.write(f"**Nội dung:**")
+                st.write("**Nội dung:**")
                 st.info(row.get('Nội Dung', ''))
                 st.caption(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
     else:
         st.info("Chưa có thông báo nào trong hệ thống.")
 
-elif "2. 📋 Danh Bạ Thôn" in choice:
-    st.markdown("### 📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
+elif st.session_state.active_tab == "2. 📋 Danh Bạ Thôn":
+    st.markdown("### 📋 Danh Bạ Cán Bộ & Cư Dân")
     df_db = load_excel_data("DanhBaThon")
     display_mobile_cards(df_db, "Họ Tên", ["Chức Vụ", "Số Điện Thoại", "Cán Bộ"])
 
-elif "3. 🎉 Sự Kiện Cộng Đồng" in choice:
+elif st.session_state.active_tab == "3. 🎉 Sự Kiện Cộng Đồng":
     st.markdown("### 🎉 Sự Kiện Cộng Đồng")
     df_sk_hien_thi = get_updated_events_df()
     display_mobile_cards(df_sk_hien_thi, "Tên Sự Kiện", ["Mô Tả", "Thời Gian Bắt Đầu", "Địa Điểm", "Tổng Số Hộ Tham Gia"])
 
-elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
+elif st.session_state.active_tab == "4. 📝 Đăng Ký & Điểm Danh":
     st.markdown("### 📝 Đăng Ký Hoạt Động & Điểm Danh")
     df_sk = load_excel_data("SuKien")
     df_sk_hien_thi = get_updated_events_df()
@@ -364,12 +371,12 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
                     st.success(f"Cảm ơn '{ho_ten_ho}' đã đăng ký thành công!")
                     st.rerun()
 
-elif "5. 💰 Công Khai Thu Chi" in choice:
+elif st.session_state.active_tab == "5. 💰 Công Khai Thu Chi":
     st.markdown("### 💰 Công Khai Tài Chính Quỹ Thôn")
     df_tc = load_excel_data("CongKhaiThuChi")
     display_mobile_cards(df_tc, "Nội Dung", ["Ngày", "Thu (VNĐ)", "Chi (VNĐ)", "Ghi Chú"])
 
-elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
+elif st.session_state.active_tab == "6. ⚠️ Phản Ánh & Kiến Nghị":
     st.markdown("### ⚠️ Gửi Phản Ánh & Kiến Nghị")
     with st.form("form_phan_anh", clear_on_submit=True):
         nguoi_gui = st.text_input("Họ và tên của bạn")
@@ -392,12 +399,12 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
                 if save_row_to_excel("PhanAnh", data_pa):
                     st.success("Phản ánh của bạn đã được gửi thành công đến Ban quản lý thôn!")
 
-elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
+elif st.session_state.active_tab == "7. 🏆 Vinh Danh & Khen Thưởng":
     st.markdown("### 🏆 Vinh Danh & Khen Thưởng")
     df_vd = load_excel_data("VinhDanh")
     display_mobile_cards(df_vd, "Họ Tên", ["Danh Hiệu", "Lý Do Khen Thưởng", "Năm"])
 
-elif "8. 🛒 Chợ Quê Nông Sản" in choice:
+elif st.session_state.active_tab == "8. 🛒 Chợ Quê Nông Sản":
     st.markdown("### 🛒 Chợ Quê Nông Sản")
     tab_xem, tab_dang = st.tabs(["🛍️ Xem sản phẩm", "➕ Đăng bán"])
     
@@ -430,7 +437,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                         st.success("Sản phẩm đã được đăng lên chợ quê thành công!")
                         st.rerun()
 
-elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
+elif st.session_state.active_tab == "9. 📅 Đặt Lịch Nhà Văn Hóa":
     st.markdown("### 📅 Đặt Lịch Nhà Văn Hóa")
     df_dl = load_excel_data("DatLichNhaVanHoa")
     display_mobile_cards(df_dl, "Họ Tên", ["Dịch Vụ", "Ngày Sử Dụng", "Mục Đích", "Trạng Thái"])
@@ -455,7 +462,7 @@ elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
                 if save_row_to_excel("DatLichNhaVanHoa", data_dl):
                     st.success("Yêu cầu đặt lịch đã được gửi thành công.")
 
-elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
+elif st.session_state.active_tab == "10. 🛠️ Khu Vực Quản Trị Cán Bộ":
     st.markdown("### 🔐 Quản Trị Cán Bộ Thôn")
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
@@ -473,7 +480,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                     st.error("Mật khẩu không chính xác!")
     else:
         st.success("✅ Đã đăng nhập quyền cán bộ.")
-        if st.button("Đăng xuất"):
+        if st.button("Đăng xuất quản trị"):
             st.session_state.authenticated = False
             st.rerun()
 
@@ -502,7 +509,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_tb:
             st.markdown("#### Quản lý Thông Báo")
             edited_tb = st.data_editor(df_tb, num_rows="dynamic", key="editor_tb_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Thông Báo", key="btn_save_tb"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_tb"):
                 if save_entire_sheet("ThongBao", edited_tb):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -510,7 +517,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_db:
             st.markdown("#### Quản trị Danh Bạ")
             edited_db = st.data_editor(df_db, num_rows="dynamic", key="editor_db_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Danh Bạ", key="btn_save_db"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_db"):
                 if save_entire_sheet("DanhBaThon", edited_db):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -518,7 +525,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_sk:
             st.markdown("#### Quản lý Sự Kiện")
             edited_sk = st.data_editor(df_sk, num_rows="dynamic", key="editor_sk_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Sự Kiện", key="btn_save_sk"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_sk"):
                 if save_entire_sheet("SuKien", edited_sk):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -526,7 +533,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_tc:
             st.markdown("#### Quản lý Thu Chi")
             edited_tc = st.data_editor(df_tc, num_rows="dynamic", key="editor_tc_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Thu Chi", key="btn_save_tc"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_tc"):
                 if save_entire_sheet("CongKhaiThuChi", edited_tc):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -534,7 +541,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_pa:
             st.markdown("#### Quản lý Phản Ánh")
             edited_pa = st.data_editor(df_pa, num_rows="dynamic", key="editor_pa_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Phản Ánh", key="btn_save_pa"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_pa"):
                 if save_entire_sheet("PhanAnh", edited_pa):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -542,7 +549,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_vd:
             st.markdown("#### Quản lý Vinh Danh")
             edited_vd = st.data_editor(df_vd, num_rows="dynamic", key="editor_vd_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Vinh Danh", key="btn_save_vd"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_vd"):
                 if save_entire_sheet("VinhDanh", edited_vd):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -550,7 +557,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_cq:
             st.markdown("#### Quản lý Chợ Quê")
             edited_cq = st.data_editor(df_cq, num_rows="dynamic", key="editor_cq_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Chợ Quê", key="btn_save_cq"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_cq"):
                 if save_entire_sheet("ChoQue", edited_cq):
                     st.success("Đã lưu thành công!")
                     st.rerun()
@@ -558,7 +565,15 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_dl:
             st.markdown("#### Quản lý Đặt Lịch")
             edited_dl = st.data_editor(df_dl, num_rows="dynamic", key="editor_dl_free", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Đặt Lịch", key="btn_save_dl"):
+            if st.button("💾 Lưu thay đổi", key="btn_save_dl"):
                 if save_entire_sheet("DatLichNhaVanHoa", edited_dl):
                     st.success("Đã lưu thành công!")
                     st.rerun()
+
+# --- CHÂN TRANG ỨNG DỤNG ---
+st.markdown("""
+    <div class="app-footer">
+        Chương trình mục tiêu quốc gia xây dựng nông thôn mới, giảm nghèo bền vững<br>
+        © 2026 Khu Dân Cư Lăng Tô
+    </div>
+""", unsafe_allow_html=True)
