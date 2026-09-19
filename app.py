@@ -70,15 +70,15 @@ except Exception as e:
     st.error(f"Lỗi kết nối GSheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
     st.stop()
 
-# Hàm đọc dữ liệu tối ưu có sử dụng Cache để tăng tốc độ tải trang
-@st.cache_data(ttl=60)
+# Hàm đọc dữ liệu có bắt lỗi chi tiết để phát hiện sai tên Tab
 def load_gsheet_data(sheet_name):
     try:
         data = conn.read(worksheet=sheet_name, ttl=0)
         if data is None or data.empty:
             return pd.DataFrame()
         return data.dropna(how="all")
-    except Exception:
+    except Exception as e:
+        st.warning(f"⚠️ Không tìm thấy Tab có tên là **'{sheet_name}'** trong Google Sheets. Vui lòng kiểm tra lại tên Tab (Có thể do viết hoa, viết thường, có dấu tiếng Việt hoặc khoảng trắng). Chi tiết lỗi: {e}")
         return pd.DataFrame()
 
 def display_df_with_1_index(df):
@@ -87,7 +87,7 @@ def display_df_with_1_index(df):
         df_reset.insert(0, "STT", range(1, len(df_reset) + 1))
         st.dataframe(df_reset, use_container_width=True, hide_index=True)
     else:
-        st.info("Chưa có dữ liệu trong bảng này hoặc đang được cập nhật.")
+        st.info("💡 Bảng này hiện chưa có dữ liệu hoặc tên tab trên Google Sheets chưa chính xác.")
 
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
@@ -120,7 +120,7 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-# --- XỬ LÝ CHỨC NĂNG (Tải dữ liệu từng mục độc lập để tối ưu tốc độ) ---
+# --- XỬ LÝ CHỨC NĂNG ---
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
@@ -132,7 +132,7 @@ if "1. 📢 Bảng Tin & Thông Báo" in choice:
                 st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
                 st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
     else:
-        st.info("Chưa có thông báo nào.")
+        st.info("Chưa có thông báo nào hoặc không kết nối được bảng ThongBao.")
 
 elif "2. 📋 Danh Bạ Thôn" in choice:
     st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
@@ -246,7 +246,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
 
         st.markdown("---")
         
-        # Tải dữ liệu các bảng phục vụ quản trị
+        # Tải dữ liệu các bảng phục vụ khu vực quản trị
         df_tb = load_gsheet_data("ThongBao")
         df_db = load_gsheet_data("DanhBaThon")
         df_sk = load_gsheet_data("SuKien")
