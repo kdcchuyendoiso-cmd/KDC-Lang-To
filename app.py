@@ -34,7 +34,7 @@ from helpers import (
 from styles import APP_CSS
 
 st.set_page_config(
-    page_title="Khu dân cư Lăng Tô",
+    page_title="Thôn Lăng Tô",
     page_icon="🏘️",
     layout="centered",
     initial_sidebar_state="collapsed",
