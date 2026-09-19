@@ -770,7 +770,10 @@ def page_admin() -> None:
         admin_backup()
         return
 
-    
+    sheet = ADMIN_SECTIONS[choice]
+    data, config = admin_editor_data(sheet)
+    # st.caption("Bấm vào ô để sửa...") -> Dùng dấu # ở đầu để ẩn dòng này đi mà không làm lỗi code
+    edited = st.data_editor(data, num_rows="dynamic", hide_index=True, column_config=config, key=f"ed_{sheet}")
     if st.button("💾 Lưu thay đổi", key=f"save_{sheet}"):
         try:
             db.write_sheet(sheet, edited)
