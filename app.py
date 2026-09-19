@@ -70,7 +70,8 @@ except Exception as e:
     st.error(f"Lỗi kết nối GSheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
     st.stop()
 
-# Hàm đọc dữ liệu từ từng Tab (worksheet) của Google Sheets
+# Hàm đọc dữ liệu tối ưu có sử dụng Cache để tăng tốc độ tải trang
+@st.cache_data(ttl=60)
 def load_gsheet_data(sheet_name):
     try:
         data = conn.read(worksheet=sheet_name, ttl=0)
@@ -80,25 +81,13 @@ def load_gsheet_data(sheet_name):
     except Exception:
         return pd.DataFrame()
 
-# Tải dữ liệu các bảng từ Google Sheets tương ứng với 10 tab
-df_tb = load_gsheet_data("ThongBao")
-df_db = load_gsheet_data("DanhBaThon")
-df_sk = load_gsheet_data("SuKien")
-df_tc = load_gsheet_data("CongKhaiThuChi")
-df_pa = load_gsheet_data("PhanAnh")
-df_cq = load_gsheet_data("ChoQue")
-df_vd = load_gsheet_data("VinhDanh")
-df_dk = load_gsheet_data("DangKySuKien")
-df_dl = load_gsheet_data("DatLichNhaVanHoa")
-df_qt = load_gsheet_data("QuanTriCanBo")
-
 def display_df_with_1_index(df):
     if not df.empty:
         df_reset = df.reset_index(drop=True)
         df_reset.insert(0, "STT", range(1, len(df_reset) + 1))
         st.dataframe(df_reset, use_container_width=True, hide_index=True)
     else:
-        st.info("Chưa có dữ liệu trong bảng này.")
+        st.info("Chưa có dữ liệu trong bảng này hoặc đang được cập nhật.")
 
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
@@ -131,10 +120,11 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-# --- XỬ LÝ CHỨC NĂNG ---
+# --- XỬ LÝ CHỨC NĂNG (Tải dữ liệu từng mục độc lập để tối ưu tốc độ) ---
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
+    df_tb = load_gsheet_data("ThongBao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
             ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
@@ -146,14 +136,17 @@ if "1. 📢 Bảng Tin & Thông Báo" in choice:
 
 elif "2. 📋 Danh Bạ Thôn" in choice:
     st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
+    df_db = load_gsheet_data("DanhBaThon")
     display_df_with_1_index(df_db)
 
 elif "3. 🎉 Sự Kiện Cộng Đồng" in choice:
     st.header("🎉 Sự Kiện Cộng Đồng")
+    df_sk = load_gsheet_data("SuKien")
     display_df_with_1_index(df_sk)
 
 elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
+    df_sk = load_gsheet_data("SuKien")
     display_df_with_1_index(df_sk)
     
     with st.form("form_dang_ky", clear_on_submit=True):
@@ -171,6 +164,7 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
 
 elif "5. 💰 Công Khai Thu Chi" in choice:
     st.header("💰 Công Khai Tài Chính Quỹ Thôn")
+    df_tc = load_gsheet_data("CongKhaiThuChi")
     display_df_with_1_index(df_tc)
 
 elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
@@ -189,10 +183,12 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
 
 elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
     st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân Tiêu Biểu")
+    df_vd = load_gsheet_data("VinhDanh")
     display_df_with_1_index(df_vd)
 
 elif "8. 🛒 Chợ Quê Nông Sản" in choice:
     st.header("🛒 Chợ Quê — Trao Đổi & Đăng Bán Nông Sản")
+    df_cq = load_gsheet_data("ChoQue")
     tab_xem, tab_dang = st.tabs(["🛍️ Xem nông sản", "➕ Đăng bán sản phẩm"])
     with tab_xem:
         display_df_with_1_index(df_cq)
@@ -212,6 +208,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
 
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
+    df_dl = load_gsheet_data("DatLichNhaVanHoa")
     display_df_with_1_index(df_dl)
     with st.form("form_dat_lich", clear_on_submit=True):
         ho_ten_dl = st.text_input("Họ và tên người đăng ký")
@@ -248,7 +245,15 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
             st.rerun()
 
         st.markdown("---")
-        # Chia các mục quản trị thành các tab tương ứng cho toàn bộ các bảng trong hệ thống
+        
+        # Tải dữ liệu các bảng phục vụ quản trị
+        df_tb = load_gsheet_data("ThongBao")
+        df_db = load_gsheet_data("DanhBaThon")
+        df_sk = load_gsheet_data("SuKien")
+        df_tc = load_gsheet_data("CongKhaiThuChi")
+        df_pa = load_gsheet_data("PhanAnh")
+        df_vd = load_gsheet_data("VinhDanh")
+
         tab_q1, tab_q2, tab_q3, tab_q4, tab_q5, tab_q6 = st.tabs([
             "📢 Quản trị Thông Báo", 
             "📋 Quản trị Danh Bạ", 
