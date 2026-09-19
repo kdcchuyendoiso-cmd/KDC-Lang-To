@@ -798,7 +798,7 @@ def page_home() -> None:
     <div style="display: flex; align-items: center; gap: 16px; padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 16px; color: white;">
         <div style="font-size: 48px; line-height: 1;">🏠</div>
         <div style="text-align: center; flex: 1;">
-            <h2 style="margin: 0; font-size: 15px; font-weight: bold;">Thôn Lăng Tô</h2>
+            <h2 style="margin: 0; font-size: 16px; font-weight: bold;">Thôn Lăng Tô</h2>
             <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">Quản lý & điều hành</p>
         </div>
     </div>
