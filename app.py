@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from streamlit_gsheets import GsheetsConnection
+from streamlit_gsheets import GSheetsConnection
 
 # Cấu hình giao diện trang web
 st.set_page_config(
@@ -11,9 +11,9 @@ st.set_page_config(
 
 # Khởi tạo kết nối Google Sheets an toàn ở đầu ứng dụng
 try:
-    conn = st.connection("gsheets", type=GsheetsConnection)
+    conn = st.connection("gsheets", type=GSheetsConnection)
 except Exception as e:
-    st.error(f"Lỗi kết nối GsheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
+    st.error(f"Lỗi kết nối GSheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
     st.stop()
 
 # Hàm đọc dữ liệu từ từng Tab (worksheet) của Google Sheets
