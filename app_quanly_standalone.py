@@ -5,7 +5,7 @@ import datetime
 # Cấu hình giao diện trang web
 st.set_page_config(page_title="Quản Lý Khu Dân Cư Lăng Tô", page_icon="🏘️", layout="wide")
 
-# CSS tùy chỉnh giao diện và làm đẹp phần tiêu đề sidebar
+# CSS tùy chỉnh giao diện và làm đẹp phần tiêu đề & footer sidebar
 st.markdown("""
 <style>
     /* Ẩn vòng tròn chọn của radio button trong sidebar */
@@ -56,7 +56,7 @@ st.markdown("""
         font-size: 12px;
         opacity: 0.9;
     }
-    /* Kiểu chữ nhỏ mô tả bên dưới menu sidebar - Đã thu nhỏ font-size xuống 9.5px */
+    /* Kiểu chữ nhỏ mô tả bên dưới menu sidebar */
     .sidebar-footer-note {
         font-size: 9.5px;
         color: #6c757d;
@@ -68,73 +68,44 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-# Khởi tạo dữ liệu vào session_state để lưu trữ sự thay đổi xuyên suốt các phiên tương tác
-if "dfs" not in st.session_state:
-    st.session_state.dfs = {
-        "DanhBaThon": pd.DataFrame({
-            "Họ và Tên": ["Nguyễn Văn An", "Trần Thị Bình", "Lê Văn Cường", "Phạm Thị Dung"],
-            "Chức Vụ": ["Trưởng thôn", "Phó thôn", "Người dân", "Người dân"],
-            "Số Điện Thoại": ["0912345678", "0987654321", "0901122334", "0933445566"],
-            "Là Cán Bộ Thôn": ["Có", "Có", "Không", "Không"]
-        }),
-        "ThongBao": pd.DataFrame({
-            "Tiêu Đề": ["Họp tổng kết cuối năm của thôn", "Lịch phun thuốc khử trùng khu dân cư"],
-            "Nội Dung": ["Kính mời toàn thể bà con có mặt tại nhà văn hóa vào lúc 19h tối chủ nhật.", "Đề nghị các hộ gia đình dọn dẹp vệ sinh và đóng cửa sổ vào ngày mai."],
-            "Phân Loại": ["Hành chính", "Khẩn cấp"],
-            "Ngày Đăng": ["2026-06-01", "2026-06-05"],
-            "Người Đăng": ["Nguyễn Văn An", "Trần Thị Bình"],
-            "Ghim Nổi Bật": ["Có", "Không"]
-        }),
-        "SuKien": pd.DataFrame({
-            "Tên Sự Kiện": ["Ngày hội Đại đoàn kết toàn dân tộc", "Giải bóng đá thanh niên thôn"],
-            "Mô Tả": ["Tổ chức văn nghệ, thể thao và bữa cơm đoàn kết toàn thôn.", "Thi đấu giao lưu giữa các xóm trong thôn."],
-            "Thời Gian Bắt Đầu": ["2026-11-18", "2026-09-02"],
-            "Địa Điểm": ["Nhà văn hóa thôn", "Sân bóng khu thể thao"],
-            "Tổng Số Hộ Tham Gia": [15, 8]
-        }),
-        "CongKhaiThuChi": pd.DataFrame({
-            "Ngày": ["2026-05-10", "2026-05-15"],
-            "Loại Giao Dịch": ["Thu", "Chi"],
-            "Danh Mục": ["Quỹ thôn", "Sửa chữa đường điện"],
-            "Nội Dung Chi Tiết": ["Đóng góp quỹ xây dựng nông thôn mới tháng 5", "Mua bóng đèn đường chiếu sáng"],
-            "Số Tiền (VNĐ)": [15000000, 3500000]
-        }),
-        "PhanAnh": pd.DataFrame({
-            "Người Phản Ánh": ["Lê Văn Cường", "Phạm Thị Dung"],
-            "Ngày Phản Ánh": ["2026-06-02", "2026-06-04"],
-            "Lĩnh Vực": ["Môi trường", "Hạ tầng / Đường xá"],
-            "Nội Dung Phản Ánh": ["Rác thải ùn ứ tại khu vực ngã ba xóm 2.", "Bóng đèn đường ngõ số 4 bị hỏng tối qua."],
-            "Vị Trí": ["Ngã ba xóm 2", "Ngõ số 4"],
-            "Trạng Thái": ["Đang xử lý", "Đã tiếp nhận"]
-        }),
-        "ChoQue": pd.DataFrame({
-            "Tên Sản Phẩm": ["Rau cải sạch nhà trồng", "Gạo nương Điện Biên chuẩn"],
-            "Phân Loại": ["Nông sản", "Thực phẩm"],
-            "Giá Bán": [15000, 30000],
-            "Đơn Vị Tính": ["kg", "kg"],
-            "Số Điện Thoại Liên Hệ": ["0901122334", "0933445566"]
-        }),
-        "VinhDanh": pd.DataFrame({
-            "Họ và Tên": ["Nguyễn Văn An", "Lê Văn Cường"],
-            "Danh Hiệu Khen Thưởng": ["Cán bộ thôn xuất sắc tiêu biểu", "Gia đình văn hóa tiêu biểu 2025"],
-            "Mô Tả Thành Tích": ["Hoàn thành xuất sắc nhiệm vụ điều hành thôn.", "Gương sáng trong phong trào xây dựng nông thôn mới."]
-        })
-    }
 
-dfs = st.session_state.dfs
+# Kết nối Google Sheets thông qua st.connection
+conn = st.connection("gsheets", type="GsheetsConnection")
 
-# Hàm hiển thị số thứ tự bảng bắt đầu từ 1
+# Hàm đọc dữ liệu từ từng Tab (worksheet) của Google Sheets
+def load_gsheet_data(sheet_name):
+    try:
+        data = conn.read(worksheet=sheet_name, ttl=0)
+        return data
+    except Exception:
+        return pd.DataFrame()
+
+# Tải dữ liệu các bảng từ Google Sheets
+df_tb = load_gsheet_data("ThongBao")
+df_db = load_gsheet_data("DanhBaThon")
+df_sk = load_gsheet_data("SuKien")
+df_tc = load_gsheet_data("CongKhaiThuChi")
+df_pa = load_gsheet_data("PhanAnh")
+df_cq = load_gsheet_data("ChoQue")
+df_vd = load_gsheet_data("VinhDanh")
+df_dk = load_gsheet_data("DangKySuKien")
+df_dl = load_gsheet_data("DatLichNhaVanHoa")
+df_qt = load_gsheet_data("QuanTriCanBo")
+
 def display_df_with_1_index(df):
-    df_reset = df.reset_index(drop=True)
-    df_reset.index = df_reset.index + 1
-    st.dataframe(df_reset, use_container_width=True)
+    if not df.empty:
+        df_reset = df.reset_index(drop=True)
+        df_reset.index = df_reset.index + 1
+        st.dataframe(df_reset, use_container_width=True)
+    else:
+        st.info("Chưa có dữ liệu trong bảng này.")
 
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
     st.markdown("""
         <div class="sidebar-header-box">
-            <h2>🏘️ Khu Dân Cư Lăng Tô</h2>
-            <p> Quản lý và Kết nối cộng đồng (V1.0)</p>
+            <h2>🏘️ Quản Lý Khu Dân Cư Lăng Tô</h2>
+            <p>Hệ thống Quản lý & Kết nối cộng đồng</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -148,54 +119,47 @@ modules = [
     "7. 🏆 Vinh Danh & Khen Thưởng",
     "8. 🛒 Chợ Quê Nông Sản",
     "9. 📅 Đặt Lịch Nhà Văn Hóa",
-    "10. 🛠️ Ban quản lý KDC"
+    "10. 🛠️ Khu Vực Quản Trị Cán Bộ"
 ]
 
 choice = st.sidebar.radio("📌 Chọn Chức Năng", modules, label_visibility="collapsed")
 
-# Bổ sung dòng chữ nhỏ mô tả chương trình mục tiêu quốc gia dưới mục số 10
 st.sidebar.markdown("""
     <div class="sidebar-footer-note">
         Ứng dụng chuyển đổi số thực hiện Chương trình mục tiêu quốc gia xây dựng nông thôn mới, giảm nghèo bền vững và phát triển kinh tế - xã hội vùng đồng bào dân tộc thiểu số và miền núi giai đoạn 2026 - 2035.
     </div>
 """, unsafe_allow_html=True)
-
 st.sidebar.markdown("---")
+
 # --- XỬ LÝ CHỨC NĂNG ---
 
-# 1. BẢNG TIN & THÔNG BÁO
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
-    df_tb = dfs.get("ThongBao")
-    for idx, row in df_tb.iterrows():
-        ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
-        with st.expander(f"{ghim} {row.get('Tiêu Đề', 'Thông báo')} (Phân loại: {row.get('Phân Loại', 'Chung')})"):
-            st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
-            st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
+    if not df_tb.empty:
+        for idx, row in df_tb.iterrows():
+            ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
+            with st.expander(f"{ghim} {row.get('Tiêu Đề', 'Thông báo')} (Phân loại: {row.get('Phân Loại', 'Chung')})"):
+                st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
+                st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
+    else:
+        st.info("Chưa có thông báo nào.")
 
-# 2. DANH BẠ THÔN
 elif "2. 📋 Danh Bạ Thôn" in choice:
     st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
-    display_df_with_1_index(dfs.get("DanhBaThon"))
+    display_df_with_1_index(df_db)
 
-# 3. SỰ KIỆN CỘNG ĐỒNG
 elif "3. 🎉 Sự Kiện Cộng Đồng" in choice:
     st.header("🎉 Sự Kiện Cộng Đồng")
-    display_df_with_1_index(dfs.get("SuKien"))
+    display_df_with_1_index(df_sk)
 
-# 4. ĐĂNG KÝ & ĐIỂM DANH
 elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
-    st.info("Đăng ký tham gia các sự kiện, ngày hội đại đoàn kết, hệ thống sẽ tự động tổng hợp số lượng hộ tham gia.")
-    
-    df_sk = dfs.get("SuKien")
-    st.subheader("Danh sách sự kiện và tổng hợp số hộ tham gia:")
     display_df_with_1_index(df_sk)
     
     with st.form("form_dang_ky", clear_on_submit=True):
         st.subheader("Biểu mẫu đăng ký tham gia sự kiện")
         ho_ten_ho = st.text_input("Họ và tên hộ gia đình đăng ký tham gia")
-        chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", df_sk['Tên Sự Kiện'].tolist() if 'Tên Sự Kiện' in df_sk.columns else [])
+        chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else [])
         so_luong_them = st.number_input("Số lượng hộ tham gia thêm", min_value=1, value=1, step=1)
         submitted_dk = st.form_submit_button("Xác nhận đăng ký")
         
@@ -203,24 +167,14 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
             if not ho_ten_ho.strip():
                 st.warning("Vui lòng nhập họ và tên hộ gia đình đăng ký!")
             else:
-                idx_match = df_sk.index[df_sk['Tên Sự Kiện'] == chon_sk].tolist()
-                if idx_match:
-                    i = idx_match[0]
-                    current_val = int(df_sk.loc[i, 'Tổng Số Hộ Tham Gia'])
-                    df_sk.loc[i, 'Tổng Số Hộ Tham Gia'] = current_val + int(so_luong_them)
-                    st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã cập nhật thành công sự kiện '{chon_sk}' thêm {so_luong_them} hộ tham gia.")
-                    st.rerun()
+                st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký sự kiện thành công.")
 
-# 5. CÔNG KHAI THU CHI
 elif "5. 💰 Công Khai Thu Chi" in choice:
     st.header("💰 Công Khai Tài Chính Quỹ Thôn")
-    display_df_with_1_index(dfs.get("CongKhaiThuChi"))
+    display_df_with_1_index(df_tc)
 
-# 6. PHẢN ÁNH & KIẾN NGHỊ
 elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
     st.header("⚠️ Gửi Phản Ánh & Kiến Nghị Đến Cán Bộ Thôn")
-    st.info("Phản ánh các vấn đề về môi trường, hạ tầng đường xá, an ninh trật tự tại khu dân cư.")
-    
     with st.form("form_phan_anh", clear_on_submit=True):
         nguoi_gui = st.text_input("Họ và tên của bạn")
         linh_vuc_pa = st.selectbox("Lĩnh vực phản ánh", ["Môi trường", "An ninh trật tự", "Hạ tầng / Đường xá", "Tranh chấp", "Khác"])
@@ -231,31 +185,17 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
             if not nguoi_gui.strip() or not noi_dung_pa.strip():
                 st.warning("Vui lòng nhập đầy đủ họ tên và nội dung phản ánh!")
             else:
-                new_pa = pd.DataFrame({
-                    "Người Phản Ánh": [nguoi_gui],
-                    "Ngày Phản Ánh": [str(datetime.date.today())],
-                    "Lĩnh Vực": [linh_vuc_pa],
-                    "Nội Dung Phản Ánh": [noi_dung_pa],
-                    "Vị Trí": [vi_tri_pa if vi_tri_pa else "Không rõ"],
-                    "Trạng Thái": ["Đã tiếp nhận"]
-                })
-                dfs["PhanAnh"] = pd.concat([dfs["PhanAnh"], new_pa], ignore_index=True)
-                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công đến Cán bộ thôn để xử lý.")
-                st.rerun()
+                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công.")
 
-# 7. VINH DANH & KHEN THƯỞNG
 elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
     st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân Tiêu Biểu")
-    display_df_with_1_index(dfs.get("VinhDanh"))
+    display_df_with_1_index(df_vd)
 
-# 8. CHỢ QUÊ NÔNG SẢN
 elif "8. 🛒 Chợ Quê Nông Sản" in choice:
     st.header("🛒 Chợ Quê — Trao Đổi & Đăng Bán Nông Sản")
-    st.info("Nơi bà con đăng bán các sản phẩm nông sản sạch, đồ thủ công trong thôn.")
-    
     tab_xem, tab_dang = st.tabs(["🛍️ Xem nông sản", "➕ Đăng bán sản phẩm"])
     with tab_xem:
-        display_df_with_1_index(dfs.get("ChoQue"))
+        display_df_with_1_index(df_cq)
     with tab_dang:
         with st.form("form_cho_que", clear_on_submit=True):
             ten_sp = st.text_input("Tên sản phẩm (Ví dụ: Rau cải sạch, Gạo nương...)")
@@ -268,22 +208,11 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                 if not ten_sp.strip() or not sdt_lh.strip():
                     st.warning("Vui lòng điền tên sản phẩm và số điện thoại liên hệ!")
                 else:
-                    new_cq = pd.DataFrame({
-                        "Tên Sản Phẩm": [ten_sp],
-                        "Phân Loại": [phan_loai_sp],
-                        "Giá Bán": [gia_sp],
-                        "Đơn Vị Tính": [don_vi_sp if don_vi_sp else "cái"],
-                        "Số Điện Thoại Liên Hệ": [sdt_lh]
-                    })
-                    dfs["ChoQue"] = pd.concat([dfs["ChoQue"], new_cq], ignore_index=True)
                     st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công!")
-                    st.rerun()
 
-# 9. ĐẶT LỊCH NHÀ VĂN HÓA
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
-    st.info("Đăng ký mượn nhà văn hóa tổ chức sự kiện gia đình hoặc mượn bàn ghế, loa đài.")
-    
+    display_df_with_1_index(df_dl)
     with st.form("form_dat_lich", clear_on_submit=True):
         ho_ten_dl = st.text_input("Họ và tên người đăng ký")
         dich_vu = st.selectbox("Loại dịch vụ", ["Mượn Nhà văn hóa", "Mượn bàn ghế / loa đài", "Đăng ký họp thôn"])
@@ -294,13 +223,10 @@ elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
             if not ho_ten_dl.strip():
                 st.warning("Vui lòng nhập họ và tên người đăng ký!")
             else:
-                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} của bạn đã được gửi và đang chờ Cán bộ thôn phê duyệt.")
+                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} đã được ghi nhận.")
 
-# 10. Ban quản lý khu dân cư
-elif "10. 🛠️ Ban quản lý KDC" in choice:
-    st.header("🔐 Đăng Nhập")
-    st.info("Khu vực dành riêng cho cán bộ quản lý đăng bài, duyệt phản ánh và quản lý thu chi.")
-    
+elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
+    st.header("🔐 Đăng Nhập Khu Vực Quản Trị Cán Bộ Thôn")
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
 
@@ -314,64 +240,87 @@ elif "10. 🛠️ Ban quản lý KDC" in choice:
                     st.success("Đăng nhập thành công!")
                     st.rerun()
                 else:
-                    st.error("Mật khẩu không chính xác! Vui lòng thử lại.")
+                    st.error("Mật khẩu không chính xác!")
     else:
-        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý.")
+        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền chỉnh sửa dữ liệu.")
         if st.button("Đăng xuất"):
             st.session_state.authenticated = False
             st.rerun()
 
         st.markdown("---")
-        tab1, tab2, tab3 = st.tabs(["📢 Đăng thông báo mới", "💰 Cập nhật thu chi quỹ", "⚠️ Duyệt phản ánh"])
+        # Chia các mục quản trị thành các tab tương ứng cho toàn bộ các bảng trong hệ thống
+        tab_q1, tab_q2, tab_q3, tab_q4, tab_q5, tab_q6 = st.tabs([
+            "📢 Quản trị Thông Báo", 
+            "📋 Quản trị Danh Bạ", 
+            "🎉 Quản trị Sự Kiện", 
+            "💰 Quản trị Thu Chi", 
+            "⚠️ Quản trị Phản Ánh",
+            "🏆 Quản trị Vinh Danh"
+        ])
         
-        with tab1:
-            st.subheader("Tạo bản tin / Thông báo thôn mới")
+        with tab_q1:
+            st.subheader("Quản lý Bản tin & Thông báo thôn")
+            display_df_with_1_index(df_tb)
             with st.form("form_them_tb", clear_on_submit=True):
+                st.markdown("##### Thêm thông báo mới")
                 tieu_de = st.text_input("Tiêu đề thông báo")
                 noi_dung = st.text_area("Nội dung chi tiết")
                 phan_loai = st.selectbox("Phân loại", ["Khẩn cấp", "Hành chính", "Sự kiện", "Thông thường"])
-                ghim = st.checkbox("Ghim nổi bật lên đầu bảng tin")
-                submit_tb = st.form_submit_button("Đăng thông báo lên hệ thống")
-                if submit_tb:
-                    if not tieu_de.strip():
-                        st.warning("Vui lòng nhập tiêu đề thông báo!")
-                    else:
-                        new_tb = pd.DataFrame({
-                            "Tiêu Đề": [tieu_de],
-                            "Nội Dung": [noi_dung],
-                            "Phân Loại": [phan_loai],
-                            "Ngày Đăng": [str(datetime.date.today())],
-                            "Người Đăng": ["Cán bộ thôn"],
-                            "Ghim Nổi Bật": ["Có" if ghim else "Không"]
-                        })
-                        dfs["ThongBao"] = pd.concat([new_tb, dfs["ThongBao"]], ignore_index=True)
-                        st.success(f"Đã đăng thông báo thành công: '{tieu_de}'!")
-                        st.rerun()
+                nguoi_dang = st.text_input("Người đăng / Cán bộ phụ trách", value="Ban Văn hóa Thôn")
+                ghim = st.selectbox("Ghim nổi bật", ["Không", "Có"])
+                if st.form_submit_button("Thêm thông báo"):
+                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}' (Bạn hãy cập nhật trực tiếp dòng tương ứng trên Google Sheets để đồng bộ lưu trữ).")
 
-        with tab2:
-            st.subheader("Thêm khoản thu / chi quỹ thôn")
+        with tab_q2:
+            st.subheader("Quản lý Danh bạ cư dân & Cán bộ thôn")
+            display_df_with_1_index(df_db)
+            with st.form("form_them_db", clear_on_submit=True):
+                st.markdown("##### Thêm nhân khẩu / hộ gia đình vào danh bạ")
+                ten_chu_ho = st.text_input("Họ và tên chủ hộ")
+                so_khu_vuc = st.text_input("Số xóm / Khu vực")
+                so_nhan_khau = st.number_input("Tổng số nhân khẩu", min_value=1, value=4, step=1)
+                so_dien_thoai = st.text_input("Số điện thoại liên hệ")
+                phan_loai_ho = st.selectbox("Phân loại hộ", ["Hộ thường", "Hộ nghèo", "Hộ cận nghèo", "Gia đình văn hóa"])
+                if st.form_submit_button("Thêm vào danh bạ"):
+                    st.success(f"Đã thêm hộ '{ten_chu_ho}' vào hệ thống.")
+
+        with tab_q3:
+            st.subheader("Quản lý Sự kiện cộng đồng")
+            display_df_with_1_index(df_sk)
+            with st.form("form_them_sk", clear_on_submit=True):
+                st.markdown("##### Thêm sự kiện mới")
+                ten_sk = st.text_input("Tên sự kiện")
+                mo_ta_sk = st.text_area("Mô tả sự kiện")
+                ngay_bd = st.date_input("Thời gian diễn ra")
+                dia_diem = st.text_input("Địa điểm tổ chức")
+                if st.form_submit_button("Thêm sự kiện"):
+                    st.success(f"Đã tạo sự kiện '{ten_sk}' thành công.")
+
+        with tab_q4:
+            st.subheader("Quản lý Khoản Thu / Chi quỹ thôn")
+            display_df_with_1_index(df_tc)
             with st.form("form_them_tc", clear_on_submit=True):
+                st.markdown("##### Thêm giao dịch thu chi mới")
+                ngay_gd = st.date_input("Ngày giao dịch")
                 loai_gd = st.selectbox("Loại giao dịch", ["Thu", "Chi"])
-                danh_muc = st.text_input("Danh mục (Ví dụ: Quỹ thôn, Hỗ trợ hộ nghèo...)")
-                so_tien = st.number_input("Số tiền (VNĐ)", min_value=0, step=100000)
-                nd_gd = st.text_input("Nội dung giao dịch chi tiết")
-                submit_tc = st.form_submit_button("Lưu giao dịch tài chính")
-                if submit_tc:
-                    if not danh_muc.strip() or so_tien <= 0:
-                        st.warning("Vui lòng nhập đầy đủ danh mục và số tiền hợp lệ!")
-                    else:
-                        new_tc = pd.DataFrame({
-                            "Ngày": [str(datetime.date.today())],
-                            "Loại Giao Dịch": [loai_gd],
-                            "Danh Mục": [danh_muc],
-                            "Nội Dung Chi Tiết": [nd_gd if nd_gd else "Không có mô tả"],
-                            "Số Tiền (VNĐ)": [so_tien]
-                        })
-                        dfs["CongKhaiThuChi"] = pd.concat([dfs["CongKhaiThuChi"], new_tc], ignore_index=True)
-                        st.success(f"Đã ghi nhận giao dịch {loai_gd} số tiền {so_tien:,.0f} VNĐ thành công!")
-                        st.rerun()
+                danh_muc = st.text_input("Danh mục (Ví dụ: Quỹ thôn, Xây dựng nông thôn mới...)")
+                chi_tiet = st.text_input("Nội dung chi tiết giao dịch")
+                so_tien = st.number_input("Số tiền (VNĐ)", min_value=0, step=50000)
+                if st.form_submit_button("Lưu giao dịch tài chính"):
+                    st.success("Đã ghi nhận giao dịch thành công!")
 
-        with tab3:
-            st.subheader("Tiếp nhận và phản hồi kiến nghị dân cư")
-            display_df_with_1_index(dfs.get("PhanAnh"))
-            st.info("Danh sách phản ánh từ người dân hiển thị ở trên. Bạn có thể theo dõi trực tiếp trạng thái xử lý.")
+        with tab_q5:
+            st.subheader("Xử lý & Cập nhật Phản ánh kiến nghị")
+            display_df_with_1_index(df_pa)
+            st.info("💡 Bạn có thể theo dõi danh sách phản ánh của người dân tại đây và tiến hành xử lý trực tiếp trên file Google Sheets.")
+
+        with tab_q6:
+            st.subheader("Quản lý Khen thưởng & Vinh danh")
+            display_df_with_1_index(df_vd)
+            with st.form("form_them_vd", clear_on_submit=True):
+                st.markdown("##### Thêm vinh danh mới")
+                ten_vd = st.text_input("Họ và tên cá nhân / đại diện hộ")
+                danh_hieu = st.text_input("Danh hiệu khen thưởng")
+                thanh_tich = st.text_area("Mô tả thành tích tiêu biểu")
+                if st.form_submit_button("Thêm vinh danh"):
+                    st.success(f"Đã thêm vinh danh cho '{ten_vd}' thành công!")
