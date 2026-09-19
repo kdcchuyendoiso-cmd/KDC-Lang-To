@@ -138,6 +138,23 @@ def display_df_with_1_index(df):
     else:
         st.info("💡 Bảng này hiện chưa có dữ liệu hoặc tên tab trong file Excel không khớp.")
 
+# --- HÀM AN TOÀN ÉP KIỂU SỐ ---
+def safe_int(val, default=0):
+    try:
+        if pd.isna(val):
+            return default
+        return int(float(val))
+    except:
+        return default
+
+def safe_float(val, default=0.0):
+    try:
+        if pd.isna(val):
+            return default
+        return float(val)
+    except:
+        return default
+
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
     st.markdown("""
@@ -408,7 +425,9 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                     edit_mota = st.text_area("Mô Tả", value=str(current_row.get('Mô Tả', '')))
                     edit_thoigian = st.text_input("Thời Gian Bắt Đầu", value=str(current_row.get('Thời Gian Bắt Đầu', '')))
                     edit_diadiem = st.text_input("Địa Điểm", value=str(current_row.get('Địa Điểm', '')))
-                    edit_soho = st.number_input("Tổng Số Hộ Tham Gia", min_value=0, value=int(current_row.get('Tổng Số Hộ Tham Gia', 0) if pd.notnull(current_row.get('Tổng Số Hộ Tham Gia', 0)) else 0))
+                    
+                    val_soho = safe_int(current_row.get('Tổng Số Hộ Tham Gia', 0))
+                    edit_soho = st.number_input("Tổng Số Hộ Tham Gia", min_value=0, value=val_soho)
                     
                     col_sua1, col_sua2 = st.columns(2)
                     with col_sua1:
