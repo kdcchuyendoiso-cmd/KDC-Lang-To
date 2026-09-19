@@ -822,7 +822,7 @@ def page_home() -> None:
 
     html_block(
         f'<div class="admin-link"><a href="{link("quan-tri")}" target="_self">🔐 Khu vực cán bộ</a></div>'
-        '<div class="tip">Mẹo: mở menu trình duyệt và chọn “Thêm vào màn hình chính” để dùng như một ứng dụng.</div>'
+        '<div class="tip">Ứng dụng chuyển đổi số V1.0.</div>'
     )
 
 
