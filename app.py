@@ -2,13 +2,17 @@ import streamlit as st
 import pandas as pd
 import datetime
 
-# Cấu hình giao diện trang web
-st.set_page_config(page_title="Quản Lý Khu Dân Cư Lăng Tô", page_icon="🏘️", layout="wide")
+# --- CẤU HÌNH TRANG WEB ---
+st.set_page_config(
+    page_title="Quản Lý Khu Dân Cư Lăng Tô", 
+    page_icon="🏘️", 
+    layout="wide"
+)
 
-# ĐƯỜNG DẪN TẢI TRỰC TIẾP FILE GOOGLE SHEETS CỦA BẠN (Thay link bên dưới bằng link của bạn)
-EXCEL_URL = "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/export?format=xlsx"
+# --- TÊN FILE EXCEL TRÊN GITHUB ---
+EXCEL_FILE = "dulieu_langto.xlsx"
 
-# CSS tùy chỉnh giao diện
+# --- CSS TÙY CHỈNH GIAO DIỆN ---
 st.markdown("""
 <style>
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div:first-child {
@@ -60,16 +64,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Hàm đọc dữ liệu trực tiếp từ Google Sheets qua URL
-@st.cache_data(ttl=5) # Cache trong 5 giây để làm mới dữ liệu nhanh chóng
-def load_gsheet_data(sheet_name):
+# --- HÀM ĐỌC DỮ LIỆU TỪ EXCEL ---
+@st.cache_data(ttl=5)
+def load_excel_data(sheet_name):
     try:
-        df = pd.read_excel(EXCEL_URL, sheet_name=sheet_name)
+        df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_name)
         if df is None or df.empty:
             return pd.DataFrame()
         return df.dropna(how="all")
     except Exception as e:
-        st.warning(f"⚠️ Không đọc được Tab **'{sheet_name}'**. Hãy kiểm tra lại tên Tab hoặc quyền chia sẻ link. Chi tiết: {e}")
+        st.warning(f"⚠️ Chưa tìm thấy tab **'{sheet_name}'** trong file `{EXCEL_FILE}`. Vui lòng kiểm tra lại tên Tab. Chi tiết: {e}")
         return pd.DataFrame()
 
 def display_df_with_1_index(df):
@@ -78,7 +82,7 @@ def display_df_with_1_index(df):
         df_reset.insert(0, "STT", range(1, len(df_reset) + 1))
         st.dataframe(df_reset, use_container_width=True, hide_index=True)
     else:
-        st.info("💡 Bảng này hiện chưa có dữ liệu hoặc tên tab trên Google Sheets chưa chính xác.")
+        st.info("💡 Bảng này hiện chưa có dữ liệu hoặc tên tab trong file Excel không khớp.")
 
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
@@ -111,11 +115,11 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-# --- XỬ LÝ CHỨC NĂNG ---
+# --- XỬ LÝ GIAO DIỆN CÁC CHỨC NĂNG ---
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
-    df_tb = load_gsheet_data("ThongBao")
+    df_tb = load_excel_data("ThongBao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
             ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
@@ -123,27 +127,28 @@ if "1. 📢 Bảng Tin & Thông Báo" in choice:
                 st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
                 st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
     else:
-        st.info("Chưa có thông báo nào hoặc không kết nối được bảng ThongBao.")
+        st.info("Chưa có thông báo nào trong hệ thống.")
 
 elif "2. 📋 Danh Bạ Thôn" in choice:
     st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
-    df_db = load_gsheet_data("DanhBaThon")
+    df_db = load_excel_data("DanhBaThon")
     display_df_with_1_index(df_db)
 
 elif "3. 🎉 Sự Kiện Cộng Đồng" in choice:
     st.header("🎉 Sự Kiện Cộng Đồng")
-    df_sk = load_gsheet_data("SuKien")
+    df_sk = load_excel_data("SuKien")
     display_df_with_1_index(df_sk)
 
 elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
-    df_sk = load_gsheet_data("SuKien")
+    df_sk = load_excel_data("SuKien")
     display_df_with_1_index(df_sk)
     
     with st.form("form_dang_ky", clear_on_submit=True):
         st.subheader("Biểu mẫu đăng ký tham gia sự kiện")
         ho_ten_ho = st.text_input("Họ và tên hộ gia đình đăng ký tham gia")
-        chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else [])
+        list_sk = df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else []
+        chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", list_sk)
         so_luong_them = st.number_input("Số lượng tham gia", min_value=1, value=1, step=1)
         ghi_chu_dk = st.text_input("Ghi chú")
         submitted_dk = st.form_submit_button("Xác nhận đăng ký")
@@ -156,12 +161,12 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
 
 elif "5. 💰 Công Khai Thu Chi" in choice:
     st.header("💰 Công Khai Tài Chính Quỹ Thôn")
-    df_tc = load_gsheet_data("CongKhaiThuChi")
+    df_tc = load_excel_data("CongKhaiThuChi")
     display_df_with_1_index(df_tc)
 
 elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
     st.header("⚠️ Gửi Phản Ánh & Kiến Nghị Đến Cán Bộ Thôn")
-    df_pa = load_gsheet_data("PhanAnh")
+    df_pa = load_excel_data("PhanAnh")
     with st.form("form_phan_anh", clear_on_submit=True):
         nguoi_gui = st.text_input("Họ và tên của bạn")
         linh_vuc_pa = st.selectbox("Lĩnh vực phản ánh", ["Môi trường", "An ninh trật tự", "Hạ tầng / Đường xá", "Tranh chấp", "Khác"])
@@ -176,12 +181,12 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
 
 elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
     st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân Tiêu Biểu")
-    df_vd = load_gsheet_data("VinhDanh")
+    df_vd = load_excel_data("VinhDanh")
     display_df_with_1_index(df_vd)
 
 elif "8. 🛒 Chợ Quê Nông Sản" in choice:
     st.header("🛒 Chợ Quê — Trao Đổi & Đăng Bán Nông Sản")
-    df_cq = load_gsheet_data("ChoQue")
+    df_cq = load_excel_data("ChoQue")
     tab_xem, tab_dang = st.tabs(["🛍️ Xem nông sản", "➕ Đăng bán sản phẩm"])
     with tab_xem:
         display_df_with_1_index(df_cq)
@@ -201,7 +206,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
 
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
-    df_dl = load_gsheet_data("DatLichNhaVanHoa")
+    df_dl = load_excel_data("DatLichNhaVanHoa")
     display_df_with_1_index(df_dl)
     with st.form("form_dat_lich", clear_on_submit=True):
         ho_ten_dl = st.text_input("Họ và tên người đăng ký")
@@ -232,19 +237,19 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 else:
                     st.error("Mật khẩu không chính xác!")
     else:
-        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền xem thông tin.")
+        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền xem thông tin từ file Excel.")
         if st.button("Đăng xuất"):
             st.session_state.authenticated = False
             st.rerun()
 
         st.markdown("---")
         
-        df_tb = load_gsheet_data("ThongBao")
-        df_db = load_gsheet_data("DanhBaThon")
-        df_sk = load_gsheet_data("SuKien")
-        df_tc = load_gsheet_data("CongKhaiThuChi")
-        df_pa = load_gsheet_data("PhanAnh")
-        df_vd = load_gsheet_data("VinhDanh")
+        df_tb = load_excel_data("ThongBao")
+        df_db = load_excel_data("DanhBaThon")
+        df_sk = load_excel_data("SuKien")
+        df_tc = load_excel_data("CongKhaiThuChi")
+        df_pa = load_excel_data("PhanAnh")
+        df_vd = load_excel_data("VinhDanh")
 
         tab_q1, tab_q2, tab_q3, tab_q4, tab_q5, tab_q6 = st.tabs([
             "📢 Quản trị Thông Báo", 
@@ -308,7 +313,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         with tab_q5:
             st.subheader("Xử lý & Cập nhật Phản ánh kiến nghị")
             display_df_with_1_index(df_pa)
-            st.info("💡 Bạn có thể theo dõi danh sách phản ánh của người dân tại đây và tiến hành xử lý trực tiếp trên file Google Sheets.")
+            st.info("💡 Bạn có thể theo dõi danh sách phản ánh của người dân tại đây.")
 
         with tab_q6:
             st.subheader("Quản lý Khen thưởng & Vinh danh")
