@@ -252,22 +252,10 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     df_sk = load_excel_data("SuKien")
     df_dk = load_excel_data("DangKySuKien")
     
-    if not df_sk.empty and not df_dk.empty:
-        if 'Tên Sự Kiện' in df_dk.columns and 'Số Lượng' in df_dk.columns:
-            df_dk['Số Lượng_num'] = pd.to_numeric(df_dk['Số Lượng'], errors='coerce').fillna(0)
-            tong_hop = df_dk.groupby('Tên Sự Kiện')['Số Lượng_num'].sum().reset_index()
-            tong_hop.rename(columns={'Số Lượng_num': 'Số Lượng'}, inplace=True)
-            df_sk_hien_thi = pd.merge(df_sk, tong_hop, on='Tên Sự Kiện', how='left')
-            df_sk_hien_thi['Số Lượng'] = df_sk_hien_thi['Số Lượng'].fillna(0).astype(int)
-        else:
-            df_sk_hien_thi = df_sk.copy()
-            df_sk_hien_thi['Số Lượng'] = 0
-    else:
-        df_sk_hien_thi = df_sk.copy()
-        if not df_sk_hien_thi.empty:
-            df_sk_hien_thi['Số Lượng'] = 0
+    # Giữ nguyên bản sự kiện gốc (chỉ hiển thị cột Tổng Số Hộ Tham Gia có sẵn trong SuKien, loại bỏ cột Số lượng đăng ký thừa)
+    df_sk_hien_thi = df_sk.copy()
 
-    st.subheader("📅 Danh sách sự kiện & Tổng hợp số lượng đăng ký tham gia")
+    st.subheader("📅 Danh sách sự kiện & Tổng số hộ tham gia")
     display_df_with_1_index(df_sk_hien_thi)
     
     with st.form("form_dang_ky", clear_on_submit=True):
@@ -426,7 +414,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         # TAB 3: QUẢN TRỊ SỰ KIỆN (Bảng chỉnh sửa tự do toàn bộ)
         with tab_q3:
             st.subheader("🎉 Quản lý & Cập nhật Sự Kiện Cộng Đồng")
-            st.info("💡 Bạn có thể click trực tiếp vào các ô bên dưới để sửa nội dung, thêm dòng mới ở cuối bảng hoặc bấm vào thùng rác để xóa dòng.")
+            st.info("💡 Bạn có thể click trực tiếp vào các ô bên dưới để sửa nội dung, thêm dòng mới ở cuối bảng hoặc bấm vào biểu tượng thùng rác để xóa dòng.")
             edited_sk = st.data_editor(df_sk, num_rows="dynamic", key="editor_sk_free", use_container_width=True)
             if st.button("💾 Lưu thay đổi Sự Kiện", key="btn_save_sk"):
                 if save_entire_sheet("SuKien", edited_sk):
