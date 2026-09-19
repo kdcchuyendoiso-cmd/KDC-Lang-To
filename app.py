@@ -64,16 +64,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- HÀM ĐỌC DỮ LIỆU TỪ EXCEL ---
+# --- HÀM ĐỌC DỮ LIỆU THÔNG MINH (KHÔNG PHÂN BIỆT HOA/THƯỜNG TÊN TAB) ---
 @st.cache_data(ttl=5)
 def load_excel_data(sheet_name):
     try:
-        df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_name)
-        if df is None or df.empty:
+        xls = pd.ExcelFile(EXCEL_FILE)
+        # Tạo từ điển ánh xạ tên viết thường sang tên gốc trong file Excel
+        sheet_map = {s.lower(): s for s in xls.sheet_names}
+        target_lower = sheet_name.lower()
+        
+        if target_lower in sheet_map:
+            df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_map[target_lower])
+            if df is None or df.empty:
+                return pd.DataFrame()
+            return df.dropna(how="all")
+        else:
+            st.warning(f"⚠️ Không tìm thấy Tab **'{sheet_name}'** trong file `{EXCEL_FILE}`. Các Tab hiện có trong file của bạn là: {list(xls.sheet_names)}")
             return pd.DataFrame()
-        return df.dropna(how="all")
     except Exception as e:
-        st.warning(f"⚠️ Chưa tìm thấy tab **'{sheet_name}'** trong file `{EXCEL_FILE}`. Vui lòng kiểm tra lại tên Tab. Chi tiết: {e}")
+        st.warning(f"⚠️ Chưa đọc được file `{EXCEL_FILE}`. Chi tiết lỗi: {e}")
         return pd.DataFrame()
 
 def display_df_with_1_index(df):
