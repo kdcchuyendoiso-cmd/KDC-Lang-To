@@ -45,9 +45,17 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS GIAO DIỆN TỐI ƯU (CĂN GIỮA BANNER & NÚT BO TRÒN 3 CỘT) ---
+# --- CSS GIAO DIỆN TỐI ƯU MOBILE (3 NÚT 1 HÀNG & FULL MÀN HÌNH NỘI DUNG) ---
 st.markdown("""
 <style>
+    /* Ép bố cục Streamlit sử dụng tối đa chiều rộng màn hình điện thoại */
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 1.5rem !important;
+        max-width: 100% !important;
+    }
+
     /* Tổng thể nền trang */
     .stApp {
         background-color: #f4f6f9;
@@ -57,49 +65,65 @@ st.markdown("""
     .app-banner {
         background: linear-gradient(135deg, #d32f2f, #b71c1c);
         color: white;
-        padding: 20px;
+        padding: 16px;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         text-align: center;
     }
     .app-banner h3 {
         margin: 0;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         letter-spacing: 0.5px;
     }
     .app-banner p {
-        margin: 6px 0 0 0;
-        font-size: 13px;
+        margin: 4px 0 0 0;
+        font-size: 12px;
         opacity: 0.95;
     }
+
+    /* Cố định các cột trong Streamlit không bị rớt dòng trên màn hình nhỏ (Giữ đúng 3 nút 1 hàng trên điện thoại) */
+    [data-testid="column"] {
+        width: calc(33.333% - 0.5rem) !important;
+        flex: 1 1 calc(33.333% - 0.5rem) !important;
+        min-width: calc(33.333% - 0.5rem) !important;
+        padding: 0 3px !important;
+    }
     
-    /* Nút bấm dịch vụ dạng thẻ bo tròn gọn gàng (1 hàng 3 nút) */
+    /* Nút bấm dịch vụ dạng thẻ bo tròn gọn gàng */
     .stButton button {
-        width: 100%;
+        width: 100% !important;
         background-color: white;
         color: #333;
         border: 1px solid #e0e0e0;
-        border-radius: 25px; /* Bo tròn hoàn toàn */
-        padding: 10px 12px;
-        font-size: 13px;
+        border-radius: 20px;
+        padding: 8px 4px;
+        font-size: 11.5px;
         font-weight: 600;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+    
     .stButton button:hover {
         border-color: #d32f2f;
         color: #d32f2f;
-        box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
-        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.15);
+        transform: translateY(-1px);
     }
 
-    /* Thu nhỏ chữ dataframe */
+    /* Thu nhỏ chữ dataframe và tối ưu hiển thị full màn hình mobile */
     [data-testid="stDataFrame"] div, [data-testid="stDataEditor"] div {
-        font-size: 13px !important;
+        font-size: 12px !important;
+    }
+    
+    table {
+        width: 100% !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -232,7 +256,7 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- DANH SÁCH NÚT DỊCH VỤ (BỐ TRÍ 3 CỘT / HÀNG) ---
+    # --- DANH SÁCH NÚT DỊCH VỤ (BỐ TRÍ 3 CỘT / HÀNG CẢ TRÊN MOBILE) ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
@@ -257,10 +281,9 @@ if st.session_state.current_page == "Trang Chủ":
     with col9:
         if st.button("📅 Đặt Lịch", use_container_width=True): navigate_to("Đặt Lịch Nhà Văn Hóa")
 
-    # Nút Quản Trị đặt riêng dòng dưới cùng để dễ thao tác
     col10, col11, col12 = st.columns(3)
     with col11:
-        if st.button("🔐 Cán Bộ Quản Trị", use_container_width=True): navigate_to("Khu Vực Quản Trị Cán Bộ")
+        if st.button("🔐 Quản Trị", use_container_width=True): navigate_to("Khu Vực Quản Trị Cán Bộ")
 
 
 # ================= CHI TIẾT CÁC TÍNH NĂNG =================
