@@ -769,12 +769,12 @@ def page_admin() -> None:
                 st.session_state["is_admin"] = True
                 st.rerun()
             else:
-                time.sleep(1)  # làm chậm việc dò mật khẩu
+                time.sleep(1)
                 st.error("Mật khẩu chưa đúng. Vui lòng thử lại.")
         return
 
     if admin_password() == DEFAULT_PASSWORD:
-        st.warning("Đang dùng mật khẩu mặc định. Hãy đặt ADMIN_PASSWORD trong Secrets để bảo mật (xem README).")
+        st.warning("Đang dùng mật khẩu mặc định. Hãy cấu hình lại bảo mật nếu cần.")
     if st.button("Đăng xuất"):
         st.session_state["is_admin"] = False
         st.rerun()
@@ -786,15 +786,32 @@ def page_admin() -> None:
 
     sheet = ADMIN_SECTIONS[choice]
     data, config = admin_editor_data(sheet)
-    st.caption("Bấm vào ô để sửa. Bấm dấu + cuối bảng để thêm dòng; chọn dòng rồi nhấn Delete để xóa. Nhớ bấm Lưu thay đổi.")
+    
+    # Thêm cột checkbox chọn xóa vào bảng dữ liệu quản trị
+    if not data.empty:
+        if "_xoa" not in data.columns:
+            data.insert(0, "_xoa", False)
+        config["_xoa"] = st.column_config.CheckboxColumn("🗑️ Xóa?", default=False)
+
     edited = st.data_editor(data, num_rows="dynamic", hide_index=True, column_config=config, key=f"ed_{sheet}")
-    if st.button("💾 Lưu thay đổi", key=f"save_{sheet}"):
-        try:
-            db.write_sheet(sheet, edited)
-        except Exception as exc:
-            st.error(f"Chưa lưu được: {exc}")
-        else:
-            flash("success", f"Đã lưu mục '{choice}'.")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("💾 Lưu thay đổi", type="primary", use_container_width=True):
+            try:
+                # Lọc bỏ các dòng có tích chọn xóa trước khi ghi dữ liệu xuống database
+                if "_xoa" in edited.columns:
+                    final_data = edited[edited["_xoa"] == False].drop(columns=["_xoa"])
+                else:
+                    final_data = edited
+                db.write_sheet(sheet, final_data)
+            except Exception as exc:
+                st.error(f"Lỗi khi lưu dữ liệu: {exc}")
+            else:
+                flash("success", "Đã lưu thay đổi và xóa các dòng đã chọn thành công!")
+                st.rerun()
+    with col2:
+        if st.button("🔄 Làm mới bảng", use_container_width=True):
             st.rerun()
 
 
