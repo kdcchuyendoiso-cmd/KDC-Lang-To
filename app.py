@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import openpyxl
 
 # --- CẤU HÌNH TRANG WEB ---
 st.set_page_config(
@@ -64,12 +65,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- HÀM ĐỌC DỮ LIỆU THÔNG MINH (KHÔNG PHÂN BIỆT HOA/THƯỜNG TÊN TAB) ---
-@st.cache_data(ttl=5)
+# --- HÀM ĐỌC & GHI DỮ LIỆU EXCEL THÔNG MINH ---
+@st.cache_data(ttl=2)
 def load_excel_data(sheet_name):
     try:
         xls = pd.ExcelFile(EXCEL_FILE)
-        # Tạo từ điển ánh xạ tên viết thường sang tên gốc trong file Excel
         sheet_map = {s.lower(): s for s in xls.sheet_names}
         target_lower = sheet_name.lower()
         
@@ -79,11 +79,38 @@ def load_excel_data(sheet_name):
                 return pd.DataFrame()
             return df.dropna(how="all")
         else:
-            st.warning(f"⚠️ Không tìm thấy Tab **'{sheet_name}'** trong file `{EXCEL_FILE}`. Các Tab hiện có trong file của bạn là: {list(xls.sheet_names)}")
             return pd.DataFrame()
     except Exception as e:
-        st.warning(f"⚠️ Chưa đọc được file `{EXCEL_FILE}`. Chi tiết lỗi: {e}")
         return pd.DataFrame()
+
+def save_row_to_excel(sheet_name, new_data_dict):
+    """Hàm phụ trợ thêm dòng mới vào sheet Excel chỉ định"""
+    try:
+        book = openpyxl.load_workbook(EXCEL_FILE)
+        sheet_map = {s.lower(): s for s in book.sheetnames}
+        target_lower = sheet_name.lower()
+        
+        if target_lower in sheet_map:
+            actual_sheet_name = sheet_map[target_lower]
+            ws = book[actual_sheet_name]
+            
+            # Lấy tiêu đề từ dòng đầu tiên
+            headers = [cell.value for cell in ws[1]]
+            new_row = [new_data_dict.get(h, "") for h in headers]
+            ws.append(new_row)
+            book.save(EXCEL_FILE)
+            st.cache_data.clear()
+            return True
+        else:
+            # Nếu chưa có sheet, tạo mới qua pandas
+            with pd.ExcelWriter(EXCEL_FILE, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                df_new = pd.DataFrame([new_data_dict])
+                df_new.to_excel(writer, sheet_name=sheet_name, index=False)
+            st.cache_data.clear()
+            return True
+    except Exception as e:
+        st.error(f"Lỗi khi lưu dữ liệu vào Excel: {e}")
+        return False
 
 def display_df_with_1_index(df):
     if not df.empty:
@@ -150,12 +177,32 @@ elif "3. 🎉 Sự Kiện Cộng Đồng" in choice:
 
 elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
+    
+    # Hiển thị danh sách sự kiện và tổng hợp số lượng đăng ký tự động
     df_sk = load_excel_data("SuKien")
-    display_df_with_1_index(df_sk)
+    df_dk = load_excel_data("DangKySuKien")
+    
+    if not df_sk.empty and not df_dk.empty:
+        # Kiểm tra xem có cột 'Tên Sự Kiện' và 'Số Lượng' không để tổng hợp
+        if 'Tên Sự Kiện' in df_dk.columns and 'Số Lượng' in df_dk.columns:
+            tong_hop = df_dk.groupby('Tên Sự Kiện')['Số Lượng'].sum().reset_index()
+            df_sk_hien_thi = pd.merge(df_sk, tong_hop, on='Tên Sự Kiện', how='left')
+            df_sk_hien_thi['Số Lượng'] = df_sk_hien_thi['Số Lượng'].fillna(0).astype(int)
+        else:
+            df_sk_hien_thi = df_sk.copy()
+            if 'Số Lượng' not in df_sk_hien_thi.columns:
+                df_sk_hien_thi['Số Lượng'] = 0
+    else:
+        df_sk_hien_thi = df_sk.copy()
+        if not df_sk_hien_thi.empty and 'Số Lượng' not in df_sk_hien_thi.columns:
+            df_sk_hien_thi['Số Lượng'] = 0
+
+    st.subheader("📅 Danh sách sự kiện & Tổng hợp số lượng đăng ký tham gia")
+    display_df_with_1_index(df_sk_hien_thi)
     
     with st.form("form_dang_ky", clear_on_submit=True):
         st.subheader("Biểu mẫu đăng ký tham gia sự kiện")
-        ho_ten_ho = st.text_input("Họ và tên hộ gia đình đăng ký tham gia")
+        ho_ten_ho = st.text_input("Họ và tên hộ gia đình / cá nhân đăng ký")
         list_sk = df_sk['Tên Sự Kiện'].tolist() if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns else []
         chon_sk = st.selectbox("Chọn sự kiện cần đăng ký", list_sk)
         so_luong_them = st.number_input("Số lượng tham gia", min_value=1, value=1, step=1)
@@ -166,7 +213,16 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
             if not ho_ten_ho.strip():
                 st.warning("Vui lòng nhập họ và tên hộ gia đình đăng ký!")
             else:
-                st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký sự kiện thành công.")
+                data_dang_ky = {
+                    "Họ Tên": ho_ten_ho,
+                    "Tên Sự Kiện": chon_sk,
+                    "Số Lượng": so_luong_them,
+                    "Ghi Chú": ghi_chu_dk,
+                    "Ngày Đăng Ký": str(datetime.date.today())
+                }
+                if save_row_to_excel("DangKySuKien", data_dang_ky):
+                    st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký thành công {so_luong_them} người tham gia.")
+                    st.rerun()
 
 elif "5. 💰 Công Khai Thu Chi" in choice:
     st.header("💰 Công Khai Tài Chính Quỹ Thôn")
@@ -175,7 +231,6 @@ elif "5. 💰 Công Khai Thu Chi" in choice:
 
 elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
     st.header("⚠️ Gửi Phản Ánh & Kiến Nghị Đến Cán Bộ Thôn")
-    df_pa = load_excel_data("PhanAnh")
     with st.form("form_phan_anh", clear_on_submit=True):
         nguoi_gui = st.text_input("Họ và tên của bạn")
         linh_vuc_pa = st.selectbox("Lĩnh vực phản ánh", ["Môi trường", "An ninh trật tự", "Hạ tầng / Đường xá", "Tranh chấp", "Khác"])
@@ -186,7 +241,16 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
             if not nguoi_gui.strip() or not noi_dung_pa.strip():
                 st.warning("Vui lòng điền đầy đủ họ tên và nội dung phản ánh!")
             else:
-                st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công.")
+                data_pa = {
+                    "Người Gửi": nguoi_gui,
+                    "Lĩnh Vực": linh_vuc_pa,
+                    "Nội Dung": noi_dung_pa,
+                    "Địa Điểm": vi_tri_pa,
+                    "Ngày Gửi": str(datetime.date.today()),
+                    "Trạng Thái": "Chờ xử lý"
+                }
+                if save_row_to_excel("PhanAnh", data_pa):
+                    st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công.")
 
 elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
     st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân Tiêu Biểu")
@@ -211,7 +275,16 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                 if not ten_sp.strip() or not sdt_lh.strip():
                     st.warning("Vui lòng điền tên sản phẩm và số điện thoại liên hệ!")
                 else:
-                    st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công!")
+                    data_cq = {
+                        "Tên Sản Phẩm": ten_sp,
+                        "Phân Loại": phan_loai_sp,
+                        "Giá Bán": gia_sp,
+                        "Đơn Vị": don_vi_sp,
+                        "Số Điện Thoại": sdt_lh,
+                        "Ngày Đăng": str(datetime.date.today())
+                    }
+                    if save_row_to_excel("ChoQue", data_cq):
+                        st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công!")
 
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
@@ -227,7 +300,15 @@ elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
             if not ho_ten_dl.strip():
                 st.warning("Vui lòng nhập họ và tên người đăng ký!")
             else:
-                st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch ngày {ngay_dat} đã được ghi nhận.")
+                data_dl = {
+                    "Họ Tên": ho_ten_dl,
+                    "Dịch Vụ": dich_vu,
+                    "Ngày Sử Dụng": str(ngay_dat),
+                    "Mục Đích": muc_dich,
+                    "Trạng Thái": "Chờ duyệt"
+                }
+                if save_row_to_excel("DatLichNhaVanHoa", data_dl):
+                    st.success(f"Cảm ơn {ho_ten_dl}! Yêu cầu đặt lịch đã được gửi.")
 
 elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
     st.header("🔐 Đăng Nhập Khu Vực Quản Trị Cán Bộ Thôn")
@@ -246,7 +327,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 else:
                     st.error("Mật khẩu không chính xác!")
     else:
-        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền xem thông tin từ file Excel.")
+        st.success("✅ Bạn đang ở chế độ Cán bộ quản lý toàn quyền chỉnh sửa dữ liệu hệ thống.")
         if st.button("Đăng xuất"):
             st.session_state.authenticated = False
             st.rerun()
@@ -273,26 +354,50 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
             st.subheader("Quản lý Bản tin & Thông báo thôn")
             display_df_with_1_index(df_tb)
             with st.form("form_them_tb", clear_on_submit=True):
-                st.markdown("##### Thêm thông báo mới")
+                st.markdown("##### Thêm thông báo mới vào hệ thống")
                 tieu_de = st.text_input("Tiêu đề thông báo")
                 noi_dung = st.text_area("Nội dung chi tiết")
                 phan_loai = st.selectbox("Phân loại", ["Khẩn cấp", "Hành chính", "Sự kiện", "Thông thường"])
                 nguoi_dang = st.text_input("Người đăng / Cán bộ phụ trách", value="Ban Văn hóa Thôn")
                 ghim = st.selectbox("Ghim nổi bật", ["Không", "Có"])
-                if st.form_submit_button("Thêm thông báo"):
-                    st.success(f"Đã ghi nhận thêm thông báo: '{tieu_de}'")
+                if st.form_submit_button("Lưu thông báo"):
+                    if not tieu_de.strip():
+                        st.warning("Vui lòng nhập tiêu đề thông báo!")
+                    else:
+                        data_tb = {
+                            "Tiêu Đề": tieu_de,
+                            "Nội Dung": noi_dung,
+                            "Phân Loại": phan_loai,
+                            "Ngày Đăng": str(datetime.date.today()),
+                            "Người Đăng": nguoi_dang,
+                            "Ghim Nổi Bật": ghim
+                        }
+                        if save_row_to_excel("ThongBao", data_tb):
+                            st.success(f"Đã thêm thông báo: '{tieu_de}' thành công!")
+                            st.rerun()
 
         with tab_q2:
             st.subheader("Quản lý Danh bạ cư dân & Cán bộ thôn")
             display_df_with_1_index(df_db)
             with st.form("form_them_db", clear_on_submit=True):
-                st.markdown("##### Thêm nhân khẩu / cán bộ mới")
+                st.markdown("##### Thêm nhân khẩu / cán bộ mới vào danh bạ")
                 ho_ten = st.text_input("Họ và Tên")
-                chuc_vu = st.text_input("Chức Vụ (nếu có)")
+                chuc_vu = st.text_input("Chức Vụ (nếu có, để trống nếu là cư dân)")
                 sdt = st.text_input("Số Điện Thoại")
                 la_can_bo = st.selectbox("Là Cán Bộ Thôn", ["Không", "Có"])
-                if st.form_submit_button("Thêm vào danh bạ"):
-                    st.success(f"Đã thêm '{ho_ten}' vào danh bạ.")
+                if st.form_submit_button("Lưu vào danh bạ"):
+                    if not ho_ten.strip():
+                        st.warning("Vui lòng nhập họ và tên!")
+                    else:
+                        data_db = {
+                            "Họ Tên": ho_ten,
+                            "Chức Vụ": chuc_vu,
+                            "Số Điện Thoại": sdt,
+                            "Cán Bộ": la_can_bo
+                        }
+                        if save_row_to_excel("DanhBaThon", data_db):
+                            st.success(f"Đã thêm '{ho_ten}' vào danh bạ thành công!")
+                            st.rerun()
 
         with tab_q3:
             st.subheader("Quản lý Sự kiện cộng đồng")
@@ -304,7 +409,18 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 ngay_bd = st.date_input("Thời gian diễn ra")
                 dia_diem = st.text_input("Địa điểm tổ chức")
                 if st.form_submit_button("Thêm sự kiện"):
-                    st.success(f"Đã tạo sự kiện '{ten_sk}' thành công.")
+                    if not ten_sk.strip():
+                        st.warning("Vui lòng nhập tên sự kiện!")
+                    else:
+                        data_sk = {
+                            "Tên Sự Kiện": ten_sk,
+                            "Mô Tả": mo_ta_sk,
+                            "Ngày Diễn Ra": str(ngay_bd),
+                            "Địa Điểm": dia_diem
+                        }
+                        if save_row_to_excel("SuKien", data_sk):
+                            st.success(f"Đã tạo sự kiện '{ten_sk}' thành công!")
+                            st.rerun()
 
         with tab_q4:
             st.subheader("Quản lý Khoản Thu / Chi quỹ thôn")
@@ -317,12 +433,21 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 chi_tiet = st.text_input("Nội dung chi tiết giao dịch")
                 so_tien = st.number_input("Số tiền (VNĐ)", min_value=0, step=50000)
                 if st.form_submit_button("Lưu giao dịch tài chính"):
-                    st.success("Đã ghi nhận giao dịch thành công!")
+                    data_tc = {
+                        "Ngày": str(ngay_gd),
+                        "Loại": loai_gd,
+                        "Danh Mục": danh_muc,
+                        "Nội Dung": chi_tiet,
+                        "Số Tiền": so_tien
+                    }
+                    if save_row_to_excel("CongKhaiThuChi", data_tc):
+                        st.success("Đã ghi nhận giao dịch thành công!")
+                        st.rerun()
 
         with tab_q5:
             st.subheader("Xử lý & Cập nhật Phản ánh kiến nghị")
             display_df_with_1_index(df_pa)
-            st.info("💡 Bạn có thể theo dõi danh sách phản ánh của người dân tại đây.")
+            st.info("💡 Danh sách phản ánh từ người dân được tự động cập nhật tại đây.")
 
         with tab_q6:
             st.subheader("Quản lý Khen thưởng & Vinh danh")
@@ -333,4 +458,15 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 danh_hieu = st.text_input("Danh hiệu khen thưởng")
                 thanh_tich = st.text_area("Mô tả thành tích tiêu biểu")
                 if st.form_submit_button("Thêm vinh danh"):
-                    st.success(f"Đã thêm vinh danh cho '{ten_vd}' thành công!")
+                    if not ten_vd.strip():
+                        st.warning("Vui lòng nhập tên người được vinh danh!")
+                    else:
+                        data_vd = {
+                            "Họ Tên": ten_vd,
+                            "Danh Hiệu": danh_hieu,
+                            "Thành Tích": thanh_tich,
+                            "Ngày Vinh Danh": str(datetime.date.today())
+                        }
+                        if save_row_to_excel("VinhDanh", data_vd):
+                            st.success(f"Đã thêm vinh danh cho '{ten_vd}' thành công!")
+                            st.rerun()
