@@ -178,7 +178,10 @@ def save_row_to_excel(sheet_name, new_data_dict):
         df_current = load_excel_data(sheet_name)
         df_new = pd.DataFrame([new_data_dict])
         df_combined = pd.concat([df_current, df_new], ignore_index=True)
-        return save_entire_sheet(sheet_name, df_combined)
+        if save_entire_sheet(sheet_name, df_combined):
+            st.cache_data.clear()
+            return True
+        return False
     except Exception as e:
         st.error(f"Lỗi khi thêm dữ liệu: {e}")
         return False
@@ -200,27 +203,22 @@ def get_updated_events_df():
     if df_sk.empty:
         return df_sk
         
-    # Tạo bản sao để không ảnh hưởng dữ liệu gốc khi chưa lưu
     df_sk_calc = df_sk.copy()
     
     if not df_dk.empty and 'Tên Sự Kiện' in df_dk.columns:
-        # Chuẩn hóa cột số lượng đăng ký thành dạng số để cộng dồn
         if 'Số Lượng' in df_dk.columns:
             df_dk['Số Lượng_num'] = pd.to_numeric(df_dk['Số Lượng'], errors='coerce').fillna(1)
         else:
             df_dk['Số Lượng_num'] = 1
             
-        # Gom nhóm theo tên sự kiện và tính tổng số lượng đăng ký
         sum_dk = df_dk.groupby('Tên Sự Kiện')['Số Lượng_num'].sum().reset_index()
         
-        # Cập nhật cột Tổng Số Hộ Tham Gia dựa trên tên sự kiện khớp nhau
         for idx, row in df_sk_calc.iterrows():
             ten_sk = row.get('Tên Sự Kiện', '')
             matched = sum_dk[sum_dk['Tên Sự Kiện'].str.strip() == ten_sk.strip()]
             if not matched.empty:
                 df_sk_calc.loc[idx, 'Tổng Số Hộ Tham Gia'] = str(int(matched['Số Lượng_num'].values[0]))
             else:
-                # Nếu chưa có ai đăng ký thì hiển thị 0 hoặc giữ nguyên nếu đã có sẵn giá trị
                 current_val = str(row.get('Tổng Số Hộ Tham Gia', ''))
                 if current_val in ['', 'nan', 'None']:
                     df_sk_calc.loc[idx, 'Tổng Số Hộ Tham Gia'] = '0'
@@ -291,7 +289,6 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
     df_sk = load_excel_data("SuKien")
     
-    # Hiển thị bảng sự kiện đã cộng dồn số lượng đăng ký tự động
     df_sk_hien_thi = get_updated_events_df()
 
     st.subheader("📅 Danh sách sự kiện & Tổng số hộ tham gia")
@@ -318,7 +315,6 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
                     "Ngày Đăng Ký": str(datetime.date.today())
                 }
                 if save_row_to_excel("DangKySuKien", data_dang_ky):
-                    # Đồng thời cập nhật lại cột Tổng Số Hộ Tham Gia vào bảng SuKien trong file Excel
                     updated_sk_for_save = get_updated_events_df()
                     save_entire_sheet("SuKien", updated_sk_for_save)
                     
@@ -360,10 +356,13 @@ elif "7. 🏆 Vinh Danh & Khen Thưởng" in choice:
 
 elif "8. 🛒 Chợ Quê Nông Sản" in choice:
     st.header("🛒 Chợ Quê — Trao Đổi & Đăng Bán Nông Sản")
-    df_cq = load_excel_data("ChoQue")
+    
     tab_xem, tab_dang = st.tabs(["🛍️ Xem nông sản", "➕ Đăng bán sản phẩm"])
+    
     with tab_xem:
+        df_cq = load_excel_data("ChoQue")
         display_df_with_1_index(df_cq)
+        
     with tab_dang:
         with st.form("form_cho_que", clear_on_submit=True):
             ten_sp = st.text_input("Tên sản phẩm (Ví dụ: Rau cải sạch, Gạo nương...)")
@@ -372,6 +371,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
             don_vi_sp = st.text_input("Đơn vị tính (kg, bó, lít, con...)")
             sdt_lh = st.text_input("Số điện thoại liên hệ")
             submitted_cq = st.form_submit_button("Đăng bán sản phẩm")
+            
             if submitted_cq:
                 if not ten_sp.strip() or not sdt_lh.strip():
                     st.warning("Vui lòng điền tên sản phẩm và số điện thoại liên hệ!")
@@ -386,6 +386,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                     }
                     if save_row_to_excel("ChoQue", data_cq):
                         st.success(f"Sản phẩm '{ten_sp}' đã được đăng lên Chợ Quê thành công!")
+                        st.rerun()
 
 elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
     st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa & Thiết Bị")
