@@ -14,33 +14,32 @@ st.set_page_config(
 # --- TÊN FILE EXCEL TRÊN GITHUB ---
 EXCEL_FILE = "dulieu_langto.xlsx"
 
-# --- KHỞI TẠO FILE EXCEL AN TOÀN NẾU CHƯA CÓ HOẶC THIẾU SHEET ---
-DEFAULT_SHEETS = {
-    "ThongBao": pd.DataFrame(columns=["Tiêu Đề", "Nội Dung", "Phân Loại", "Ngày Đăng", "Người Đăng", "Ghim Nổi Bật"]),
-    "DanhBaThon": pd.DataFrame(columns=["Họ Tên", "Chức Vụ", "Số Điện Thoại", "Cán Bộ"]),
-    "SuKien": pd.DataFrame(columns=["Tên Sự Kiện", "Mô Tả", "Thời Gian Bắt Đầu", "Địa Điểm", "Tổng Số Hộ Tham Gia"]),
-    "DangKySuKien": pd.DataFrame(columns=["Họ Tên", "Tên Sự Kiện", "Số Lượng", "Ghi Chú", "Ngày Đăng Ký"]),
-    "CongKhaiThuChi": pd.DataFrame(columns=["Ngày", "Nội Dung", "Thu (VNĐ)", "Chi (VNĐ)", "Ghi Chú"]),
-    "PhanAnh": pd.DataFrame(columns=["Người Gửi", "Lĩnh Vực", "Nội Dung", "Địa Điểm", "Ngày Gửi", "Trạng Thái"]),
-    "VinhDanh": pd.DataFrame(columns=["Họ Tên", "Danh Hiệu", "Lý Do Khen Thưởng", "Năm"]),
-    "ChoQue": pd.DataFrame(columns=["Tên Sản Phẩm", "Phân Loại", "Giá Bán", "Đơn Vị", "Số Điện Thoại", "Ngày Đăng"]),
-    "DatLichNhaVanHoa": pd.DataFrame(columns=["Họ Tên", "Dịch Vụ", "Ngày Sử Dụng", "Mục Đích", "Trạng Thái"])
+# --- KHỞI TẠO CẤU TRÚC CỘT CHUẨN CHO TỪNG SHEET ---
+DEFAULT_COLUMNS = {
+    "ThongBao": ["Tiêu Đề", "Nội Dung", "Phân Loại", "Ngày Đăng", "Người Đăng", "Ghim Nổi Bật"],
+    "DanhBaThon": ["Họ Tên", "Chức Vụ", "Số Điện Thoại", "Cán Bộ"],
+    "SuKien": ["Tên Sự Kiện", "Mô Tả", "Thời Gian Bắt Đầu", "Địa Điểm", "Tổng Số Hộ Tham Gia"],
+    "DangKySuKien": ["Họ Tên", "Tên Sự Kiện", "Số Lượng", "Ghi Chú", "Ngày Đăng Ký"],
+    "CongKhaiThuChi": ["Ngày", "Nội Dung", "Thu (VNĐ)", "Chi (VNĐ)", "Ghi Chú"],
+    "PhanAnh": ["Người Gửi", "Lĩnh Vực", "Nội Dung", "Địa Điểm", "Ngày Gửi", "Trạng Thái"],
+    "VinhDanh": ["Họ Tên", "Danh Hiệu", "Lý Do Khen Thưởng", "Năm"],
+    "ChoQue": ["Tên Sản Phẩm", "Phân Loại", "Giá Bán", "Đơn Vị", "Số Điện Thoại", "Ngày Đăng"],
+    "DatLichNhaVanHoa": ["Họ Tên", "Dịch Vụ", "Ngày Sử Dụng", "Mục Đích", "Trạng Thái"]
 }
 
 def init_excel_file():
     if not os.path.exists(EXCEL_FILE):
         with pd.ExcelWriter(EXCEL_FILE, engine='openpyxl') as writer:
-            for sheet, df in DEFAULT_SHEETS.items():
-                df.to_excel(writer, sheet_name=sheet, index=False)
+            for sheet, cols in DEFAULT_COLUMNS.items():
+                pd.DataFrame(columns=cols).to_excel(writer, sheet_name=sheet, index=False)
     else:
-        # Kiểm tra xem thiếu sheet nào thì bổ sung sheet đó
         try:
             xls = pd.ExcelFile(EXCEL_FILE)
             existing_sheets = [s.lower() for s in xls.sheet_names]
             with pd.ExcelWriter(EXCEL_FILE, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-                for sheet, df in DEFAULT_SHEETS.items():
+                for sheet, cols in DEFAULT_COLUMNS.items():
                     if sheet.lower() not in existing_sheets:
-                        df.to_excel(writer, sheet_name=sheet, index=False)
+                        pd.DataFrame(columns=cols).to_excel(writer, sheet_name=sheet, index=False)
         except Exception:
             pass
 
@@ -98,12 +97,24 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- HÀM LÀM SẠCH & ĐỌC DỮ LIỆU EXCEL AN TOÀN ---
-def clean_dataframe(df):
-    if df is None or df.empty:
-        return pd.DataFrame()
+# --- HÀM LÀM SẠCH & CHUẨN HÓA CỘT EXCEL ---
+def clean_dataframe(df, sheet_name):
+    if df is None:
+        df = pd.DataFrame()
+    
+    # Loại bỏ các cột thừa (Unnamed, nan...)
     df = df.loc[:, ~df.columns.astype(str).str.contains('Unnamed|none|nan', case=False, na=False)]
     df = df.dropna(how="all")
+    
+    # Đảm bảo đúng chuẩn các cột mong muốn nếu sheet có sẵn trong cấu hình
+    if sheet_name in DEFAULT_COLUMNS:
+        expected_cols = DEFAULT_COLUMNS[sheet_name]
+        for col in expected_cols:
+            if col not in df.columns:
+                df[col] = ""
+        # Sắp xếp lại đúng thứ tự cột chuẩn
+        df = df[expected_cols]
+        
     for col in df.columns:
         if pd.api.types.is_datetime64_any_dtype(df[col]):
             df[col] = df[col].dt.strftime('%Y-%m-%d')
@@ -120,18 +131,17 @@ def load_excel_data(sheet_name):
         
         if target_lower in sheet_map:
             df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_map[target_lower])
-            df_clean = clean_dataframe(df)
-            if df_clean.empty and sheet_name in DEFAULT_SHEETS:
-                return DEFAULT_SHEETS[sheet_name].copy()
-            return df_clean
+            return clean_dataframe(df, sheet_name)
         else:
-            return DEFAULT_SHEETS.get(sheet_name, pd.DataFrame()).copy()
+            cols = DEFAULT_COLUMNS.get(sheet_name, [])
+            return pd.DataFrame(columns=cols)
     except Exception as e:
-        return DEFAULT_SHEETS.get(sheet_name, pd.DataFrame()).copy()
+        cols = DEFAULT_COLUMNS.get(sheet_name, [])
+        return pd.DataFrame(columns=cols)
 
 def save_entire_sheet(sheet_name, df_modified):
     try:
-        df_modified = clean_dataframe(df_modified)
+        df_modified = clean_dataframe(df_modified, sheet_name)
         init_excel_file()
         xls = pd.ExcelFile(EXCEL_FILE)
         sheet_map = {s.lower(): s for s in xls.sheet_names}
@@ -143,7 +153,13 @@ def save_entire_sheet(sheet_name, df_modified):
                 all_dfs[actual_sheet_name] = df_modified
             else:
                 df_s = pd.read_excel(EXCEL_FILE, sheet_name=s)
-                all_dfs[s] = clean_dataframe(df_s)
+                # Tìm tên key gốc trong DEFAULT_COLUMNS để làm sạch đúng chuẩn
+                found_key = s
+                for k in DEFAULT_COLUMNS:
+                    if k.lower() == s.lower():
+                        found_key = k
+                        break
+                all_dfs[s] = clean_dataframe(df_s, found_key)
                 
         if actual_sheet_name not in all_dfs:
             all_dfs[actual_sheet_name] = df_modified
@@ -169,7 +185,7 @@ def save_row_to_excel(sheet_name, new_data_dict):
         return False
 
 def display_df_with_1_index(df):
-    df_clean = clean_dataframe(df)
+    df_clean = clean_dataframe(df, "")
     if not df_clean.empty:
         df_reset = df_clean.reset_index(drop=True)
         df_reset.insert(0, "STT", range(1, len(df_reset) + 1))
@@ -179,7 +195,7 @@ def display_df_with_1_index(df):
 
 def safe_int(val, default=0):
     try:
-        if pd.isna(val):
+        if pd.isna(val) or str(val).strip() == "":
             return default
         return int(float(val))
     except:
@@ -388,7 +404,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 else:
                     st.error("Mật khẩu không chính xác!")
     else:
-        st.success("✅ Cán bộ đã đăng nhập thành công. Bạn có thể chỉnh sửa trực tiếp dữ liệu bên dưới bằng bảng hoặc các biểu mẫu.")
+        st.success("✅ Cán bộ đã đăng nhập thành công. Bạn có thể thêm, chỉnh sửa hoặc xóa dữ liệu an toàn tại các tab bên dưới.")
         if st.button("Đăng xuất"):
             st.session_state.authenticated = False
             st.rerun()
@@ -414,14 +430,75 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
             "📅 Đặt Lịch & Chợ Quê"
         ])
         
-        # TAB 3: SỰ KIỆN
+        # TAB 3: QUẢN TRỊ SỰ KIỆN (Dùng Form Thêm / Sửa / Xóa chuẩn xác tuyệt đối)
         with tab_q3:
             st.subheader("🎉 Quản lý & Cập nhật Sự Kiện Cộng Đồng")
-            edited_sk = st.data_editor(df_sk, num_rows="dynamic", key="editor_sk_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Sự Kiện"):
-                if save_entire_sheet("SuKien", edited_sk):
-                    st.success("Đã lưu sự kiện thành công!")
-                    st.rerun()
+            
+            with st.expander("➕ Thêm sự kiện mới"):
+                with st.form("form_them_sk_moi", clear_on_submit=True):
+                    t_sk = st.text_input("Tên sự kiện")
+                    m_sk = st.text_area("Mô tả sự kiện")
+                    ng_sk = st.text_input("Thời gian bắt đầu (Ví dụ: 2026-11-18)")
+                    d_sk = st.text_input("Địa điểm")
+                    s_sk = st.number_input("Tổng số hộ tham gia dự kiến", min_value=0, value=0)
+                    if st.form_submit_button("Thêm sự kiện mới"):
+                        if not t_sk.strip():
+                            st.warning("Vui lòng nhập tên sự kiện!")
+                        else:
+                            data_moi = {
+                                "Tên Sự Kiện": t_sk,
+                                "Mô Tả": m_sk,
+                                "Thời Gian Bắt Đầu": ng_sk,
+                                "Địa Điểm": d_sk,
+                                "Tổng Số Hộ Tham Gia": s_sk
+                            }
+                            if save_row_to_excel("SuKien", data_moi):
+                                st.success("Đã thêm sự kiện thành công!")
+                                st.rerun()
+
+            st.markdown("---")
+            st.markdown("##### ✏️ Chỉnh sửa hoặc Xóa sự kiện hiện có")
+            if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns:
+                danh_sach_ten_sk = df_sk['Tên Sự Kiện'].tolist()
+                chon_su_kien = st.selectbox("Chọn sự kiện cần chỉnh sửa / xóa", danh_sach_ten_sk)
+                
+                matched_rows = df_sk[df_sk['Tên Sự Kiện'] == chon_su_kien]
+                if not matched_rows.empty:
+                    row_idx = matched_rows.index[0]
+                    cur_row = df_sk.loc[row_idx]
+                    
+                    with st.form("form_sua_sk_chi_tiet"):
+                        edit_t = st.text_input("Tên Sự Kiện", value=str(cur_row.get('Tên Sự Kiện', '')))
+                        edit_m = st.text_area("Mô Tả", value=str(cur_row.get('Mô Tả', '')))
+                        edit_ng = st.text_input("Thời Gian Bắt Đầu", value=str(cur_row.get('Thời Gian Bắt Đầu', '')))
+                        edit_d = st.text_input("Địa Điểm", value=str(cur_row.get('Địa Điểm', '')))
+                        
+                        val_s = safe_int(cur_row.get('Tổng Số Hộ Tham Gia', 0))
+                        edit_s = st.number_input("Tổng Số Hộ Tham Gia", min_value=0, value=val_s)
+                        
+                        col_b1, col_b2 = st.columns(2)
+                        with col_b1:
+                            save_btn = st.form_submit_button("💾 Lưu thay đổi")
+                        with col_b2:
+                            del_btn = st.form_submit_button("🗑️ Xóa sự kiện")
+                            
+                        if save_btn:
+                            df_sk.loc[row_idx, 'Tên Sự Kiện'] = edit_t
+                            df_sk.loc[row_idx, 'Mô Tả'] = edit_m
+                            df_sk.loc[row_idx, 'Thời Gian Bắt Đầu'] = edit_ng
+                            df_sk.loc[row_idx, 'Địa Điểm'] = edit_d
+                            df_sk.loc[row_idx, 'Tổng Số Hộ Tham Gia'] = edit_s
+                            if save_entire_sheet("SuKien", df_sk):
+                                st.success("Đã cập nhật sự kiện thành công!")
+                                st.rerun()
+                                
+                        if del_btn:
+                            df_sk = df_sk.drop(row_idx).reset_index(drop=True)
+                            if save_entire_sheet("SuKien", df_sk):
+                                st.success("Đã xóa sự kiện thành công!")
+                                st.rerun()
+            else:
+                st.info("Chưa có sự kiện nào trong hệ thống.")
 
         # TAB 1: THÔNG BÁO
         with tab_q1:
