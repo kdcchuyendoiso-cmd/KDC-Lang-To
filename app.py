@@ -69,9 +69,13 @@ st.markdown("""
 def clean_dataframe(df):
     if df is None or df.empty:
         return pd.DataFrame()
-    # Loại bỏ các cột có tên chứa chữ 'Unnamed' hoặc rỗng/None
+    # Loại bỏ các cột Unnamed hoặc trống
     df = df.loc[:, ~df.columns.astype(str).str.contains('Unnamed|none|nan', case=False, na=False)]
     df = df.dropna(how="all")
+    # Chuyển đổi các cột datetime sang chuỗi text để tránh lỗi khi chỉnh sửa trên st.data_editor
+    for col in df.columns:
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].dt.strftime('%Y-%m-%d')
     return df
 
 @st.cache_data(ttl=2)
@@ -92,7 +96,6 @@ def load_excel_data(sheet_name):
 def save_entire_sheet(sheet_name, df_modified):
     """Hàm lưu toàn bộ bảng dữ liệu sau khi sửa trực tiếp hoặc xóa"""
     try:
-        # Làm sạch DataFrame trước khi lưu để tránh lưu các cột Unnamed thừa
         df_modified = clean_dataframe(df_modified)
         
         xls = pd.ExcelFile(EXCEL_FILE)
@@ -436,6 +439,29 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
 
         with tab_q3:
             st.subheader("🎉 Quản lý Sự Kiện Cộng Đồng")
+            with st.expander("➕ Thêm sự kiện mới"):
+                with st.form("form_them_sk", clear_on_submit=True):
+                    ten_sk = st.text_input("Tên sự kiện")
+                    mo_ta_sk = st.text_area("Mô tả")
+                    ngay_sk = st.date_input("Thời gian bắt đầu")
+                    dia_diem_sk = st.text_input("Địa điểm")
+                    so_ho_sk = st.number_input("Tổng số hộ tham gia dự kiến", min_value=0, value=0)
+                    if st.form_submit_button("Thêm sự kiện mới"):
+                        if not ten_sk.strip():
+                            st.warning("Vui lòng nhập tên sự kiện!")
+                        else:
+                            data_sk_moi = {
+                                "Tên Sự Kiện": ten_sk,
+                                "Mô Tả": mo_ta_sk,
+                                "Thời Gian Bắt Đầu": str(ngay_sk),
+                                "Địa Điểm": dia_diem_sk,
+                                "Tổng Số Hộ Tham Gia": so_ho_sk
+                            }
+                            if save_row_to_excel("SuKien", data_sk_moi):
+                                st.success("Đã thêm sự kiện thành công!")
+                                st.rerun()
+
+            st.markdown("---")
             edited_sk = st.data_editor(df_sk, num_rows="dynamic", key="editor_sk_full")
             if st.button("💾 Lưu thay đổi Sự Kiện"):
                 if save_entire_sheet("SuKien", edited_sk):
