@@ -41,11 +41,17 @@ st.set_page_config(
 )
 st.markdown("""
     <style>
-    /* Ẩn triệt để footer, thanh hosted và các thành phần bản quyền của Streamlit */
+    /* 1. Ẩn Footer mặc định */
     footer {visibility: hidden !important; display: none !important;}
-    .viewerBadge_container__1QSob {visibility: hidden !important; display: none !important;}
+    
+    /* 2. Ẩn badge "Hosted with Streamlit" của Streamlit Cloud */
+    [data-testid="stViewerBadge"] {visibility: hidden !important; display: none !important;}
+    div[class*="viewerBadge"] {visibility: hidden !important; display: none !important;}
+    div[class*="stViewerBadge"] {visibility: hidden !important; display: none !important;}
+    
+    /* 3. Ẩn các liên kết chân trang dẫn tới Streamlit */
+    a[href*="streamlit.io"] {visibility: hidden !important; display: none !important;}
     #stDecoration {display: none !important;}
-    div[data-testid="stStatusWidget"] {visibility: hidden !important; display: none !important;}
     </style>
 """, unsafe_allow_html=True)
 
