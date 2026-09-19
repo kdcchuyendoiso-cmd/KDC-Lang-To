@@ -445,14 +445,15 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         df_dl = load_excel_data("DatLichNhaVanHoa")
         df_cq = load_excel_data("ChoQue")
 
+        # Rút gọn tên các tab để hiển thị trọn vẹn trên màn hình
         tab_q3, tab_q1, tab_q2, tab_q4, tab_q5, tab_q6, tab_q7 = st.tabs([
-            "🎉 Quản trị Sự Kiện", 
-            "📢 Đăng & Sửa Thông Báo", 
-            "📋 Quản trị Danh Bạ Thôn", 
-            "💰 Quản trị Thu Chi", 
-            "⚠️ Xử lý Phản Ánh",
-            "🏆 Quản trị Vinh Danh",
-            "📅 Đặt Lịch & Chợ Quê"
+            "🎉 Sự Kiện", 
+            "📢 Thông Báo", 
+            "📋 Danh Bạ", 
+            "💰 Thu Chi", 
+            "⚠️ Phản Ánh",
+            "🏆 Vinh Danh",
+            "📅 Lịch & Chợ"
         ])
         
         # TAB 3: QUẢN TRỊ SỰ KIỆN
