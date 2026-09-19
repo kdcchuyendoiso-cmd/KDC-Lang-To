@@ -39,7 +39,20 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed",
 )
-
+st.markdown("""
+    <style>
+    /* Ẩn dòng chữ mờ "Press Enter to submit form" bên trong ô nhập liệu */
+    .stTextInput div[data-baseweb="input"]::after,
+    .stTextArea textarea ~ div {
+        display: none !important;
+    }
+    
+    /* Ẩn chữ gợi ý nhỏ phía dưới input nếu có */
+    div[data-testid="InputInstructions"] {
+        display: none !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # =====================================================================
 # Cấu hình các trang
