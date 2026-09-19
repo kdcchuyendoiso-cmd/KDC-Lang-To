@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
-import datetime
+from streamlit_gsheets import GsheetsConnection
+
+# Khởi tạo kết nối Google Sheets
+try:
+    conn = st.connection("gsheets", type=GsheetsConnection)
+except Exception as e:
+    st.error(f"Lỗi kết nối GsheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
+    st.stop()
 
 # Cấu hình giao diện trang web
 st.set_page_config(page_title="Quản Lý Khu Dân Cư Lăng Tô", page_icon="🏘️", layout="wide")
