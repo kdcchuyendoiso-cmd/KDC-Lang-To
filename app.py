@@ -14,7 +14,7 @@ st.set_page_config(
 # --- TÊN FILE EXCEL ---
 EXCEL_FILE = "dulieu_langto.xlsx"
 
-# --- KHỞI TẠO CẤU TRÚC CỘT CHUẨN ---
+# --- KHỞI TẠO CẤU TRÚC CỘT CHUẨN CHO 10 TAB CHỨC NĂNG ---
 DEFAULT_COLUMNS = {
     "ThongBao": ["Tiêu Đề", "Nội Dung", "Phân Loại", "Ngày Đăng", "Người Đăng", "Ghim Nổi Bật"],
     "DanhBaThon": ["Họ Tên", "Chức Vụ", "Số Điện Thoại", "Cán Bộ"],
@@ -64,32 +64,32 @@ st.markdown("""
     .app-banner {
         background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
-        padding: 10px 12px;
-        border-radius: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
         box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
     .banner-icon {
-        font-size: 24px;
+        font-size: 28px;
         background: rgba(255, 255, 255, 0.2);
-        padding: 4px 8px;
-        border-radius: 8px;
+        padding: 6px 10px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .banner-text h3 {
         margin: 0;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
         letter-spacing: 0.3px;
     }
     .banner-text p {
         margin: 2px 0 0 0;
-        font-size: 10.5px;
+        font-size: 11px;
         opacity: 0.9;
     }
 
@@ -159,7 +159,7 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* TIÊU ĐỀ TRANG SAU: GỌN GÀNG CÙNG HÀNG HOẶC LIỀN KỀ NÚT QUAY LẠI */
+    /* TIÊU ĐỀ TRANG SAU */
     h1 {
         font-size: 13px !important;
         font-weight: 700 !important;
@@ -325,7 +325,6 @@ if st.session_state.current_page != "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # Đặt nút Streamlit bên trong container wrapper bằng cách render đơn giản
     col_back, _ = st.columns([1, 4])
     with col_back:
         if st.button("⬅️ Trang chủ", key="btn_back_home"):
@@ -346,7 +345,7 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- DANH SÁCH NÚT DỊCH VỤ (ÉP CỨNG CHUẨN 3 NÚT / HÀNG) ---
+    # --- DANH SÁCH 10 NÚT DỊCH VỤ (ÉP CỨNG CHUẨN 3 NÚT / HÀNG) ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
@@ -376,7 +375,7 @@ if st.session_state.current_page == "Trang Chủ":
         if st.button("🔐 Quản Trị", use_container_width=True): navigate_to("Khu Vực Quản Trị Cán Bộ")
 
 
-# ================= CHI TIẾT CÁC TÍNH NĂNG =================
+# ================= CHI TIẾT 10 TAB CHỨC NĂNG =================
 
 elif st.session_state.current_page == "Bảng Tin":
     df_tb = load_excel_data("ThongBao")
