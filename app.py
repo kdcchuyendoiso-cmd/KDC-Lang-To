@@ -737,34 +737,31 @@ def page_admin() -> None:
 
 
 # =====================================================================
-# Trang chủ & Điều hướng chính (BẮT BUỘC PHẢI CÓ ĐỂ HIỂN THỊ ỨNG DỤNG)
+# Trang chủ & Điều hướng chính
 # =====================================================================
 def page_home() -> None:
-    st.markdown(
+    html_block(
         """
-        <div style="text-align:center; padding: 20px 0;">
-            <h2>🏘️ Khu dân cư Lăng Tô</h2>
-            <p style="color: gray;">Cổng thông tin và tiện ích cộng đồng</p>
+        <div class="home-hero">
+          <div class="hh-title">🏘️ Khu dân cư Lăng Tô</div>
+          <div class="hh-sub">Cổng thông tin và tiện ích cộng đồng</div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
-    
-    # Hiển thị các ô điều hướng (Tiles)
     cols = st.columns(2)
     for i, slug in enumerate(TILE_SLUGS):
         p = PAGES[slug]
         with cols[i % 2]:
-            st.markdown(
+            html_block(
                 f"""
-                <a href="{link(slug)}" target="_self" style="text-decoration: none; color: inherit;">
-                    <div style="background-color: {p.bg}; padding: 16px; border-radius: 12px; margin-bottom: 12px; text-align: center;">
-                        <div style="font-size: 28px;">{p.icon}</div>
-                        <div style="font-weight: bold; color: {p.fg}; margin-top: 8px;">{p.short}</div>
-                    </div>
+                <a class="tile" href="{link(slug)}" target="_self">
+                  <div class="tile-icon" style="background:{p.bg}; color:{p.fg}">{p.icon}</div>
+                  <div class="tile-text">
+                    <div class="tile-title">{esc(p.short)}</div>
+                    <div class="tile-sub">{esc(p.title)}</div>
+                  </div>
                 </a>
-                """,
-                unsafe_allow_html=True,
+                """
             )
 
 
@@ -772,16 +769,12 @@ def main() -> None:
     st.markdown(APP_CSS, unsafe_allow_html=True)
     show_flash()
 
-    # Lấy trang hiện tại từ query params
     query_page = st.query_params.get("page", "home")
-    
     if query_page == "home" or query_page not in PAGES:
         page_home()
     else:
         page = PAGES[query_page]
         page_header(page)
-        
-        # Gọi hàm tương ứng với từng trang
         if query_page == "bang-tin":
             page_news()
         elif query_page == "danh-ba":
@@ -802,6 +795,19 @@ def main() -> None:
             page_booking()
         elif query_page == "quan-tri":
             page_admin()
+
+    if query_page != "quan-tri":
+        html_block(
+            f"""
+            <div class="nav-bar">
+              <a class="nav-item {'active' if query_page == 'home' else ''}" href="{link('home')}" target="_self">🏠 <span>Trang chủ</span></a>
+              <a class="nav-item {'active' if query_page == 'bang-tin' else ''}" href="{link('bang-tin')}" target="_self">📢 <span>Bảng tin</span></a>
+              <a class="nav-item {'active' if query_page == 'su-kien' else ''}" href="{link('su-kien')}" target="_self">🎉 <span>Sự kiện</span></a>
+              <a class="nav-item {'active' if query_page == 'danh-ba' else ''}" href="{link('danh-ba')}" target="_self">📋 <span>Danh bạ</span></a>
+              <a class="nav-item {'active' if query_page == 'quan-tri' else ''}" href="{link('quan-tri')}" target="_self">🔐 <span>Cán bộ</span></a>
+            </div>
+            """
+        )
 
 
 if __name__ == "__main__":
