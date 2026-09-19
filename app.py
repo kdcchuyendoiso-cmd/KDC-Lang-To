@@ -102,22 +102,22 @@ def clean_dataframe(df, sheet_name):
     if df is None:
         df = pd.DataFrame()
     
-    # Loại bỏ các cột thừa (Unnamed, nan...)
     df = df.loc[:, ~df.columns.astype(str).str.contains('Unnamed|none|nan', case=False, na=False)]
     df = df.dropna(how="all")
     
-    # Đảm bảo đúng chuẩn các cột mong muốn nếu sheet có sẵn trong cấu hình
     if sheet_name in DEFAULT_COLUMNS:
         expected_cols = DEFAULT_COLUMNS[sheet_name]
         for col in expected_cols:
             if col not in df.columns:
                 df[col] = ""
-        # Sắp xếp lại đúng thứ tự cột chuẩn
         df = df[expected_cols]
         
     for col in df.columns:
         if pd.api.types.is_datetime64_any_dtype(df[col]):
             df[col] = df[col].dt.strftime('%Y-%m-%d')
+        else:
+            df[col] = df[col].astype(str).replace('nan', '').replace('None', '')
+            
     return df
 
 @st.cache_data(ttl=1)
@@ -130,7 +130,7 @@ def load_excel_data(sheet_name):
         target_lower = sheet_name.lower()
         
         if target_lower in sheet_map:
-            df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_map[target_lower])
+            df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_map[target_lower], dtype=str)
             return clean_dataframe(df, sheet_name)
         else:
             cols = DEFAULT_COLUMNS.get(sheet_name, [])
@@ -152,8 +152,7 @@ def save_entire_sheet(sheet_name, df_modified):
             if s.lower() == sheet_name.lower():
                 all_dfs[actual_sheet_name] = df_modified
             else:
-                df_s = pd.read_excel(EXCEL_FILE, sheet_name=s)
-                # Tìm tên key gốc trong DEFAULT_COLUMNS để làm sạch đúng chuẩn
+                df_s = pd.read_excel(EXCEL_FILE, sheet_name=s, dtype=str)
                 found_key = s
                 for k in DEFAULT_COLUMNS:
                     if k.lower() == s.lower():
@@ -192,14 +191,6 @@ def display_df_with_1_index(df):
         st.dataframe(df_reset, use_container_width=True, hide_index=True)
     else:
         st.info("💡 Bảng này hiện chưa có dữ liệu.")
-
-def safe_int(val, default=0):
-    try:
-        if pd.isna(val) or str(val).strip() == "":
-            return default
-        return int(float(val))
-    except:
-        return default
 
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
@@ -263,7 +254,9 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     
     if not df_sk.empty and not df_dk.empty:
         if 'Tên Sự Kiện' in df_dk.columns and 'Số Lượng' in df_dk.columns:
-            tong_hop = df_dk.groupby('Tên Sự Kiện')['Số Lượng'].sum().reset_index()
+            df_dk['Số Lượng_num'] = pd.to_numeric(df_dk['Số Lượng'], errors='coerce').fillna(0)
+            tong_hop = df_dk.groupby('Tên Sự Kiện')['Số Lượng_num'].sum().reset_index()
+            tong_hop.rename(columns={'Số Lượng_num': 'Số Lượng'}, inplace=True)
             df_sk_hien_thi = pd.merge(df_sk, tong_hop, on='Tên Sự Kiện', how='left')
             df_sk_hien_thi['Số Lượng'] = df_sk_hien_thi['Số Lượng'].fillna(0).astype(int)
         else:
@@ -293,7 +286,7 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
                 data_dang_ky = {
                     "Họ Tên": ho_ten_ho,
                     "Tên Sự Kiện": chon_sk,
-                    "Số Lượng": so_luong_them,
+                    "Số Lượng": str(so_luong_them),
                     "Ghi Chú": ghi_chu_dk,
                     "Ngày Đăng Ký": str(datetime.date.today())
                 }
@@ -355,7 +348,7 @@ elif "8. 🛒 Chợ Quê Nông Sản" in choice:
                     data_cq = {
                         "Tên Sản Phẩm": ten_sp,
                         "Phân Loại": phan_loai_sp,
-                        "Giá Bán": gia_sp,
+                        "Giá Bán": str(gia_sp),
                         "Đơn Vị": don_vi_sp,
                         "Số Điện Thoại": sdt_lh,
                         "Ngày Đăng": str(datetime.date.today())
@@ -404,7 +397,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
                 else:
                     st.error("Mật khẩu không chính xác!")
     else:
-        st.success("✅ Cán bộ đã đăng nhập thành công. Bạn có thể thêm, chỉnh sửa hoặc xóa dữ liệu an toàn tại các tab bên dưới.")
+        st.success("✅ Cán bộ đã đăng nhập thành công. Bạn có thể tự do chỉnh sửa, thêm hoặc xóa trực tiếp trên các bảng bên dưới.")
         if st.button("Đăng xuất"):
             st.session_state.authenticated = False
             st.rerun()
@@ -430,81 +423,21 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
             "📅 Đặt Lịch & Chợ Quê"
         ])
         
-        # TAB 3: QUẢN TRỊ SỰ KIỆN (Dùng Form Thêm / Sửa / Xóa chuẩn xác tuyệt đối)
+        # TAB 3: QUẢN TRỊ SỰ KIỆN (Bảng chỉnh sửa tự do toàn bộ)
         with tab_q3:
             st.subheader("🎉 Quản lý & Cập nhật Sự Kiện Cộng Đồng")
-            
-            with st.expander("➕ Thêm sự kiện mới"):
-                with st.form("form_them_sk_moi", clear_on_submit=True):
-                    t_sk = st.text_input("Tên sự kiện")
-                    m_sk = st.text_area("Mô tả sự kiện")
-                    ng_sk = st.text_input("Thời gian bắt đầu (Ví dụ: 2026-11-18)")
-                    d_sk = st.text_input("Địa điểm")
-                    s_sk = st.number_input("Tổng số hộ tham gia dự kiến", min_value=0, value=0)
-                    if st.form_submit_button("Thêm sự kiện mới"):
-                        if not t_sk.strip():
-                            st.warning("Vui lòng nhập tên sự kiện!")
-                        else:
-                            data_moi = {
-                                "Tên Sự Kiện": t_sk,
-                                "Mô Tả": m_sk,
-                                "Thời Gian Bắt Đầu": ng_sk,
-                                "Địa Điểm": d_sk,
-                                "Tổng Số Hộ Tham Gia": s_sk
-                            }
-                            if save_row_to_excel("SuKien", data_moi):
-                                st.success("Đã thêm sự kiện thành công!")
-                                st.rerun()
-
-            st.markdown("---")
-            st.markdown("##### ✏️ Chỉnh sửa hoặc Xóa sự kiện hiện có")
-            if not df_sk.empty and 'Tên Sự Kiện' in df_sk.columns:
-                danh_sach_ten_sk = df_sk['Tên Sự Kiện'].tolist()
-                chon_su_kien = st.selectbox("Chọn sự kiện cần chỉnh sửa / xóa", danh_sach_ten_sk)
-                
-                matched_rows = df_sk[df_sk['Tên Sự Kiện'] == chon_su_kien]
-                if not matched_rows.empty:
-                    row_idx = matched_rows.index[0]
-                    cur_row = df_sk.loc[row_idx]
-                    
-                    with st.form("form_sua_sk_chi_tiet"):
-                        edit_t = st.text_input("Tên Sự Kiện", value=str(cur_row.get('Tên Sự Kiện', '')))
-                        edit_m = st.text_area("Mô Tả", value=str(cur_row.get('Mô Tả', '')))
-                        edit_ng = st.text_input("Thời Gian Bắt Đầu", value=str(cur_row.get('Thời Gian Bắt Đầu', '')))
-                        edit_d = st.text_input("Địa Điểm", value=str(cur_row.get('Địa Điểm', '')))
-                        
-                        val_s = safe_int(cur_row.get('Tổng Số Hộ Tham Gia', 0))
-                        edit_s = st.number_input("Tổng Số Hộ Tham Gia", min_value=0, value=val_s)
-                        
-                        col_b1, col_b2 = st.columns(2)
-                        with col_b1:
-                            save_btn = st.form_submit_button("💾 Lưu thay đổi")
-                        with col_b2:
-                            del_btn = st.form_submit_button("🗑️ Xóa sự kiện")
-                            
-                        if save_btn:
-                            df_sk.loc[row_idx, 'Tên Sự Kiện'] = edit_t
-                            df_sk.loc[row_idx, 'Mô Tả'] = edit_m
-                            df_sk.loc[row_idx, 'Thời Gian Bắt Đầu'] = edit_ng
-                            df_sk.loc[row_idx, 'Địa Điểm'] = edit_d
-                            df_sk.loc[row_idx, 'Tổng Số Hộ Tham Gia'] = edit_s
-                            if save_entire_sheet("SuKien", df_sk):
-                                st.success("Đã cập nhật sự kiện thành công!")
-                                st.rerun()
-                                
-                        if del_btn:
-                            df_sk = df_sk.drop(row_idx).reset_index(drop=True)
-                            if save_entire_sheet("SuKien", df_sk):
-                                st.success("Đã xóa sự kiện thành công!")
-                                st.rerun()
-            else:
-                st.info("Chưa có sự kiện nào trong hệ thống.")
+            st.info("💡 Bạn có thể click trực tiếp vào các ô bên dưới để sửa nội dung, thêm dòng mới ở cuối bảng hoặc bấm vào thùng rác để xóa dòng.")
+            edited_sk = st.data_editor(df_sk, num_rows="dynamic", key="editor_sk_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Sự Kiện", key="btn_save_sk"):
+                if save_entire_sheet("SuKien", edited_sk):
+                    st.success("Đã lưu sự kiện thành công!")
+                    st.rerun()
 
         # TAB 1: THÔNG BÁO
         with tab_q1:
             st.subheader("📢 Quản lý Bảng Tin & Thông Báo")
-            edited_tb = st.data_editor(df_tb, num_rows="dynamic", key="editor_tb_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Thông Báo"):
+            edited_tb = st.data_editor(df_tb, num_rows="dynamic", key="editor_tb_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Thông Báo", key="btn_save_tb"):
                 if save_entire_sheet("ThongBao", edited_tb):
                     st.success("Đã lưu thông báo thành công!")
                     st.rerun()
@@ -512,8 +445,8 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         # TAB 2: DANH BẠ THÔN
         with tab_q2:
             st.subheader("📋 Quản trị Danh Bạ Thôn")
-            edited_db = st.data_editor(df_db, num_rows="dynamic", key="editor_db_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Danh Bạ"):
+            edited_db = st.data_editor(df_db, num_rows="dynamic", key="editor_db_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Danh Bạ", key="btn_save_db"):
                 if save_entire_sheet("DanhBaThon", edited_db):
                     st.success("Đã lưu danh bạ thành công!")
                     st.rerun()
@@ -521,8 +454,8 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         # TAB 4: THU CHI
         with tab_q4:
             st.subheader("💰 Quản lý Quỹ Thôn & Thu Chi")
-            edited_tc = st.data_editor(df_tc, num_rows="dynamic", key="editor_tc_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Thu Chi"):
+            edited_tc = st.data_editor(df_tc, num_rows="dynamic", key="editor_tc_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Thu Chi", key="btn_save_tc"):
                 if save_entire_sheet("CongKhaiThuChi", edited_tc):
                     st.success("Đã lưu Thu Chi thành công!")
                     st.rerun()
@@ -530,8 +463,8 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         # TAB 5: PHẢN ÁNH
         with tab_q5:
             st.subheader("⚠️ Xử lý Phản Ánh Kiến Nghị")
-            edited_pa = st.data_editor(df_pa, num_rows="dynamic", key="editor_pa_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Phản Ánh"):
+            edited_pa = st.data_editor(df_pa, num_rows="dynamic", key="editor_pa_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Phản Ánh", key="btn_save_pa"):
                 if save_entire_sheet("PhanAnh", edited_pa):
                     st.success("Đã lưu Phản Ánh thành công!")
                     st.rerun()
@@ -539,8 +472,8 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         # TAB 6: VINH DANH
         with tab_q6:
             st.subheader("🏆 Quản lý Vinh Danh & Khen Thưởng")
-            edited_vd = st.data_editor(df_vd, num_rows="dynamic", key="editor_vd_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Vinh Danh"):
+            edited_vd = st.data_editor(df_vd, num_rows="dynamic", key="editor_vd_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Vinh Danh", key="btn_save_vd"):
                 if save_entire_sheet("VinhDanh", edited_vd):
                     st.success("Đã lưu Vinh Danh thành công!")
                     st.rerun()
@@ -548,14 +481,16 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
         # TAB 7: ĐẶT LỊCH & CHỢ QUÊ
         with tab_q7:
             st.subheader("📅 Quản lý Đặt Lịch Nhà Văn Hóa")
-            edited_dl = st.data_editor(df_dl, num_rows="dynamic", key="editor_dl_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Đặt Lịch"):
-                save_entire_sheet("DatLichNhaVanHoa", edited_dl)
-                st.success("Đã lưu Đặt Lịch thành công!")
+            edited_dl = st.data_editor(df_dl, num_rows="dynamic", key="editor_dl_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Đặt Lịch", key="btn_save_dl"):
+                if save_entire_sheet("DatLichNhaVanHoa", edited_dl):
+                    st.success("Đã lưu Đặt Lịch thành công!")
+                    st.rerun()
             
             st.markdown("---")
             st.markdown("##### 🛒 Quản lý Chợ Quê Nông Sản")
-            edited_cq = st.data_editor(df_cq, num_rows="dynamic", key="editor_cq_full", use_container_width=True)
-            if st.button("💾 Lưu thay đổi Chợ Quê"):
-                save_entire_sheet("ChoQue", edited_cq)
-                st.success("Đã lưu Chợ Quê thành công!")
+            edited_cq = st.data_editor(df_cq, num_rows="dynamic", key="editor_cq_free", use_container_width=True)
+            if st.button("💾 Lưu thay đổi Chợ Quê", key="btn_save_cq"):
+                if save_entire_sheet("ChoQue", edited_cq):
+                    st.success("Đã lưu Chợ Quê thành công!")
+                    st.rerun()
