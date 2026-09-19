@@ -1,10 +1,12 @@
 import streamlit as st
 import pandas as pd
 import datetime
-from streamlit_gsheets import GSheetsConnection
 
 # Cấu hình giao diện trang web
 st.set_page_config(page_title="Quản Lý Khu Dân Cư Lăng Tô", page_icon="🏘️", layout="wide")
+
+# ĐƯỜNG DẪN TẢI TRỰC TIẾP FILE GOOGLE SHEETS CỦA BẠN (Thay link bên dưới bằng link của bạn)
+EXCEL_URL = "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/export?format=xlsx"
 
 # CSS tùy chỉnh giao diện
 st.markdown("""
@@ -58,22 +60,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Kết nối Google Sheets
-try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-except Exception as e:
-    st.error(f"Lỗi kết nối GSheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
-    st.stop()
-
-# Hàm đọc dữ liệu an toàn
+# Hàm đọc dữ liệu trực tiếp từ Google Sheets qua URL
+@st.cache_data(ttl=5) # Cache trong 5 giây để làm mới dữ liệu nhanh chóng
 def load_gsheet_data(sheet_name):
     try:
-        data = conn.read(worksheet=sheet_name, ttl=0)
-        if data is None or data.empty:
+        df = pd.read_excel(EXCEL_URL, sheet_name=sheet_name)
+        if df is None or df.empty:
             return pd.DataFrame()
-        return data.dropna(how="all")
+        return df.dropna(how="all")
     except Exception as e:
-        st.warning(f"⚠️ Không đọc được Tab **'{sheet_name}'** từ Google Sheets. Hãy kiểm tra quyền chia sẻ file và tên Tab. Chi tiết: {e}")
+        st.warning(f"⚠️ Không đọc được Tab **'{sheet_name}'**. Hãy kiểm tra lại tên Tab hoặc quyền chia sẻ link. Chi tiết: {e}")
         return pd.DataFrame()
 
 def display_df_with_1_index(df):
@@ -174,7 +170,7 @@ elif "6. ⚠️ Phản Ánh & Kiến Nghị" in choice:
         submitted_pa = st.form_submit_button("Gửi phản ánh")
         if submitted_pa:
             if not nguoi_gui.strip() or not noi_dung_pa.strip():
-                st.warning("Vui lòng nhập đầy đủ họ tên và nội dung phản ánh!")
+                st.warning("Vui lòng điền đầy đủ họ tên và nội dung phản ánh!")
             else:
                 st.success(f"Cảm ơn {nguoi_gui}! Phản ánh của bạn đã được gửi thành công.")
 
