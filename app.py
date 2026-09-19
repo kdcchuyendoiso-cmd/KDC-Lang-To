@@ -65,7 +65,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- HÀM ĐỌC & GHI DỮ LIỆU EXCEL THÔNG MINH ---
+# --- HÀM LÀM SẠCH & ĐỌC DỮ LIỆU EXCEL ---
+def clean_dataframe(df):
+    if df is None or df.empty:
+        return pd.DataFrame()
+    # Loại bỏ các cột có tên chứa chữ 'Unnamed' hoặc rỗng/None
+    df = df.loc[:, ~df.columns.astype(str).str.contains('Unnamed|none|nan', case=False, na=False)]
+    df = df.dropna(how="all")
+    return df
+
 @st.cache_data(ttl=2)
 def load_excel_data(sheet_name):
     try:
@@ -75,9 +83,7 @@ def load_excel_data(sheet_name):
         
         if target_lower in sheet_map:
             df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_map[target_lower])
-            if df is None or df.empty:
-                return pd.DataFrame()
-            return df.dropna(how="all")
+            return clean_dataframe(df)
         else:
             return pd.DataFrame()
     except Exception as e:
@@ -86,6 +92,9 @@ def load_excel_data(sheet_name):
 def save_entire_sheet(sheet_name, df_modified):
     """Hàm lưu toàn bộ bảng dữ liệu sau khi sửa trực tiếp hoặc xóa"""
     try:
+        # Làm sạch DataFrame trước khi lưu để tránh lưu các cột Unnamed thừa
+        df_modified = clean_dataframe(df_modified)
+        
         xls = pd.ExcelFile(EXCEL_FILE)
         sheet_map = {s.lower(): s for s in xls.sheet_names}
         actual_sheet_name = sheet_map.get(sheet_name.lower(), sheet_name)
@@ -96,6 +105,7 @@ def save_entire_sheet(sheet_name, df_modified):
                     df_modified.to_excel(writer, sheet_name=actual_sheet_name, index=False)
                 else:
                     df_s = pd.read_excel(EXCEL_FILE, sheet_name=s)
+                    df_s = clean_dataframe(df_s)
                     df_s.to_excel(writer, sheet_name=s, index=False)
         st.cache_data.clear()
         return True
@@ -111,6 +121,8 @@ def save_row_to_excel(sheet_name, new_data_dict):
         actual_sheet_name = sheet_map.get(sheet_name.lower(), sheet_name)
         
         df_current = pd.read_excel(EXCEL_FILE, sheet_name=actual_sheet_name)
+        df_current = clean_dataframe(df_current)
+        
         df_new = pd.DataFrame([new_data_dict])
         df_combined = pd.concat([df_current, df_new], ignore_index=True)
         
@@ -120,8 +132,9 @@ def save_row_to_excel(sheet_name, new_data_dict):
         return False
 
 def display_df_with_1_index(df):
-    if not df.empty:
-        df_reset = df.reset_index(drop=True)
+    df_clean = clean_dataframe(df)
+    if not df_clean.empty:
+        df_reset = df_clean.reset_index(drop=True)
         df_reset.insert(0, "STT", range(1, len(df_reset) + 1))
         st.dataframe(df_reset, use_container_width=True, hide_index=True)
     else:
@@ -318,7 +331,6 @@ elif "9. 📅 Đặt Lịch Nhà Văn Hóa" in choice:
 elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
     st.header("🔐 Đăng Nhập Khu Vực Quản Trị Cán Bộ Thôn")
     if "authenticated" not in st.session_state:
-        st.authenticated = False
         st.session_state.authenticated = False
 
     if not st.session_state.authenticated:
