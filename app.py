@@ -39,7 +39,18 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed",
 )
-
+st.markdown("""
+    <style>
+    /* Ẩn footer chứa chữ Created with Streamlit và biểu tượng chiếc mũ */
+    footer {visibility: hidden;}
+    
+    /* Ẩn menu 3 gạch ở góc trên phải (nếu bạn muốn giao diện gọn như app thuần) */
+    #MainMenu {visibility: hidden;}
+    
+    /* Ẩn thanh header mặc định của Streamlit */
+    header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
 
 # =====================================================================
 # Cấu hình các trang
