@@ -36,6 +36,7 @@ from helpers import (
 # Khởi tạo CSS trực tiếp tại đây để tránh lỗi file phụ
 # =====================================================================
 APP_CSS = """
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
 :root {
