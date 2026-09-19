@@ -8,7 +8,7 @@ import openpyxl
 st.set_page_config(
     page_title="Quản Lý Khu Dân Cư Lăng Tô", 
     page_icon="🏘️", 
-    layout="centered"  # Dùng centered để bố cục giống app mobile/cổng dịch vụ công trực tuyến
+    layout="centered"
 )
 
 # --- TÊN FILE EXCEL ---
@@ -104,13 +104,6 @@ st.markdown("""
         color: #d32f2f;
         box-shadow: 0 4px 10px rgba(211, 47, 47, 0.1);
         transform: translateY(-2px);
-    }
-    
-    /* Nút quay lại trang chủ */
-    .btn-back button {
-        background-color: #6c757d !important;
-        color: white !important;
-        margin-bottom: 15px;
     }
 
     /* Thu nhỏ chữ dataframe */
@@ -231,33 +224,20 @@ def navigate_to(page_name):
     st.session_state.current_page = page_name
     st.rerun()
 
-# --- THANH ĐẦU TRANG (HEADER GIỐNG APP DỊCH VỤ CÔNG) ---
-st.markdown("""
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 24px;">🇻🇳</span>
-            <div>
-                <h2 style="margin: 0; font-size: 16px; color: #b71c1c; font-weight: 700;">UBND KHU DÂN CƯ LĂNG TÔ</h2>
-                <p style="margin: 0; font-size: 11px; color: #666;">Cổng Dịch Vụ Công & Quản Lý Cộng Đồng Trực Tuyến</p>
-            </div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
-
 # --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH ---
 if st.session_state.current_page != "Trang Chủ":
     if st.button("⬅️ Quay lại Trang Chủ", key="btn_back_home"):
         navigate_to("Trang Chủ")
     st.markdown("---")
 
-# ================= TRANG CHỦ (GIAO DIỆN TRỰC QUAN DẠNG ICON) =================
+# ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
     
-    # Banner nổi bật
+    # Banner nổi bật được tùy chỉnh theo yêu cầu
     st.markdown("""
         <div class="app-banner">
-            <h3>QUẢN LÝ & KẾT NỐI CỘNG ĐỒNG</h3>
-            <p>Đảm bảo công khai, minh bạch và nâng cao chất lượng đời sống nhân dân vùng nông thôn mới.</p>
+            <h3>KHU DÂN CƯ LĂNG TÔ</h3>
+            <p>Quản Lý Cộng Đồng</p>
         </div>
     """, unsafe_allow_html=True)
     
