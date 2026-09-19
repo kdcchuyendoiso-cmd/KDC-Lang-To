@@ -45,14 +45,13 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS ÉP CỨNG GIAO DIỆN FLEXBOX ĐỂ CHẮC CHẮN 3 NÚT 1 HÀNG TRÊN MỌI THIẾT BỊ ---
+# --- CSS ÉP BẮT BUỘC 3 CỘT NGANG CHUẨN GRID CHO MỌI THIẾT BỊ ---
 st.markdown("""
 <style>
-    /* Ép container full màn hình, chống tràn viền */
     .block-container {
-        padding-left: 0.3rem !important;
-        padding-right: 0.3rem !important;
-        padding-top: 0.3rem !important;
+        padding-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
+        padding-top: 0.4rem !important;
         max-width: 100% !important;
     }
 
@@ -93,25 +92,16 @@ st.markdown("""
         opacity: 0.9;
     }
 
-    /* ÉP CỨNG TOÀN BỘ KHỐI CỘT TRONG STREAMLIT THÀNH FLEXBOX NGANG */
-    [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
+    /* ĐỊNH NGHĨA GRID 3 CỘT ĐỂ CHẮC CHẮN NẰM NGANG HÀNG TRÊN ĐIỆN THOẠI */
+    .custom-row {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
         gap: 4px !important;
+        margin-bottom: 4px !important;
         width: 100% !important;
-        margin-bottom: 0px !important;
-    }
-
-    [data-testid="column"] {
-        width: 33.333% !important;
-        flex: 1 1 33.333% !important;
-        min-width: 33.333% !important;
-        max-width: 33.333% !important;
-        padding: 0 !important;
     }
     
-    /* Thiết kế nút bấm dịch vụ siêu gọn, vừa khít 3 nút 1 hàng */
+    /* Tùy chỉnh kích thước nút bấm vừa khít */
     .stButton button {
         width: 100% !important;
         background-color: #ffffff;
@@ -119,12 +109,11 @@ st.markdown("""
         border: 1px solid #cbd5e1;
         border-radius: 8px;
         padding: 6px 1px !important;
-        font-size: 10px !important;
+        font-size: 9.5px !important;
         font-weight: 600;
         box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 3px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -135,13 +124,13 @@ st.markdown("""
         color: #3b82f6;
     }
 
-    /* KHU VỰC ĐIỀU HƯỚNG: NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM SÁT GỌN GÀNG CÙNG 1 HÀNG */
+    /* ĐIỀU HƯỚNG TRANG SAU */
     .nav-back-container button {
         background-color: #f1f5f9 !important;
         color: #334155 !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 6px !important;
-        font-size: 10px !important;
+        font-size: 9.5px !important;
         padding: 2px 6px !important;
         font-weight: 600 !important;
         width: auto !important;
@@ -149,14 +138,13 @@ st.markdown("""
     }
 
     .nav-title-text {
-        font-size: 12px !important;
+        font-size: 11.5px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
         margin: 0 !important;
         text-align: right;
     }
 
-    /* TIÊU ĐỀ VÀ NỘI DUNG TRANG SAU */
     h1 {
         font-size: 12px !important;
     }
@@ -286,7 +274,7 @@ def navigate_to(page_name):
     st.session_state.current_page = page_name
     st.rerun()
 
-# --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH (NÚT QUAY LẠI SÁT TIÊU ĐỀ NỘI DUNG) ---
+# --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH ---
 if st.session_state.current_page != "Trang Chủ":
     page_titles = {
         "Bảng Tin": "📢 Bảng Tin & Thông Báo",
@@ -315,7 +303,6 @@ if st.session_state.current_page != "Trang Chủ":
 # ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
     
-    # Banner hiện đại bo tròn
     st.markdown("""
         <div class="app-banner">
             <div class="banner-icon">🏡</div>
@@ -326,37 +313,42 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- HÀNG 1 (3 NÚT) ---
-    col1, col2, col3 = st.columns(3)
-    with col1:
+    # Sử dụng HTML Grid Container để ép cứng 3 nút trên 1 hàng ngang cho điện thoại
+    st.markdown('<div class="custom-row">', unsafe_allow_html=True)
+    b1, b2, b3 = st.columns(3)
+    with b1: 
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
-    with col2:
+    with b2: 
         if st.button("📋 Danh Bạ", use_container_width=True): navigate_to("Danh Bạ Thôn")
-    with col3:
+    with b3: 
         if st.button("🎉 Sự Kiện", use_container_width=True): navigate_to("Sự Kiện")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- HÀNG 2 (3 NÚT) ---
-    col4, col5, col6 = st.columns(3)
-    with col4:
+    st.markdown('<div class="custom-row">', unsafe_allow_html=True)
+    b4, b5, b6 = st.columns(3)
+    with b4: 
         if st.button("💰 Thu Chi", use_container_width=True): navigate_to("Công Khai Thu Chi")
-    with col5:
+    with b5: 
         if st.button("📝 Đăng Ký", use_container_width=True): navigate_to("Đăng Ký Sự Kiện")
-    with col6:
+    with b6: 
         if st.button("⚠️ Phản Ánh", use_container_width=True): navigate_to("Phản Ánh Kiến Nghị")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- HÀNG 3 (3 NÚT) ---
-    col7, col8, col9 = st.columns(3)
-    with col7:
+    st.markdown('<div class="custom-row">', unsafe_allow_html=True)
+    b7, b8, b9 = st.columns(3)
+    with b7: 
         if st.button("🏆 Vinh Danh", use_container_width=True): navigate_to("Vinh Danh Khen Thưởng")
-    with col8:
+    with b8: 
         if st.button("🛒 Chợ Quê", use_container_width=True): navigate_to("Chợ Quê Nông Sản")
-    with col9:
+    with b9: 
         if st.button("📅 Đặt Lịch", use_container_width=True): navigate_to("Đặt Lịch Nhà Văn Hóa")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- HÀNG 4: NÚT QUẢN TRỊ ĐẶC BIỆT ---
-    col10, col11, col12 = st.columns(3)
-    with col11:
+    st.markdown('<div class="custom-row">', unsafe_allow_html=True)
+    b10, b11, b12 = st.columns(3)
+    with b11: 
         if st.button("🔐 Quản Trị", use_container_width=True): navigate_to("Khu Vực Quản Trị Cán Bộ")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ================= CHI TIẾT 10 TAB CHỨC NĂNG =================
