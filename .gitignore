@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+
+# Bí mật
+.streamlit/secrets.toml
+
+# File tạm/sao lưu do ứng dụng tạo ra
+*.bak
+*.tmp
+
+# Dữ liệu cư dân (số điện thoại, phản ánh, đặt lịch...) - KHÔNG đưa lên GitHub công khai.
+# Nếu repo để chế độ Private và muốn mang theo dữ liệu, xoá dòng dưới đây.
+dulieu_langto.xlsx
