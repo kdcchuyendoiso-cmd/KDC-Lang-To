@@ -45,14 +45,14 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS TỐI ƯU GIAO DIỆN CHUYÊN NGHIỆP & ÉP CỨNG 3 NÚT TRÊN 1 HÀNG ---
+# --- CSS TỐI ƯU GIAO DIỆN & ÉP BẮT BUỘC 3 NÚT TRÊN 1 HÀNG TRÊN MỌI THIẾT BỊ ---
 st.markdown("""
 <style>
     /* Ép toàn bộ container full màn hình, chống tràn viền */
     .block-container {
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-        padding-top: 0.5rem !important;
+        padding-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
+        padding-top: 0.4rem !important;
         max-width: 100% !important;
     }
 
@@ -64,41 +64,42 @@ st.markdown("""
     .app-banner {
         background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
-        padding: 12px 14px;
-        border-radius: 14px;
+        padding: 10px 12px;
+        border-radius: 12px;
         box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
     .banner-icon {
-        font-size: 28px;
+        font-size: 24px;
         background: rgba(255, 255, 255, 0.2);
-        padding: 6px 10px;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .banner-text h3 {
         margin: 0;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
         letter-spacing: 0.3px;
     }
     .banner-text p {
         margin: 2px 0 0 0;
-        font-size: 11px;
+        font-size: 10px;
         opacity: 0.9;
     }
 
-    /* ÉP BẮT BUỘC 3 CỘT TRÊN MỌI THIẾT BỊ DI ĐỘNG KHÔNG BỊ RỚT DÒNG */
+    /* ÉP CỨNG CHUẨN 3 CỘT TRÊN MỌI MÀN HÌNH ĐIỆN THOẠI KHÔNG BỊ XUỐNG DÒNG */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 4px !important;
+        gap: 3px !important;
+        width: 100% !important;
     }
 
     div[data-testid="column"] {
@@ -109,15 +110,15 @@ st.markdown("""
         padding: 0 1px !important;
     }
     
-    /* Thiết kế nút bấm dịch vụ dạng thẻ bo tròn cân đối */
+    /* Thiết kế nút bấm dịch vụ dạng thẻ bo tròn cân đối, chữ nhỏ gọn vừa khít 3 nút 1 hàng */
     .stButton button {
         width: 100% !important;
         background-color: #ffffff;
         color: #1e293b;
         border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 7px 1px;
-        font-size: 10.5px;
+        border-radius: 8px;
+        padding: 6px 1px;
+        font-size: 10px;
         font-weight: 600;
         box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
@@ -133,47 +134,38 @@ st.markdown("""
         color: #3b82f6;
     }
 
-    /* KHU VỰC ĐIỀU HƯỚNG: NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM SÁT GỌN GÀNG */
-    .nav-header-container {
+    /* KHU VỰC ĐIỀU HƯỚNG: NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM SÁT GỌN GÀNG CÙNG 1 HÀNG */
+    .nav-header-box {
         display: flex;
         align-items: center;
         justify-content: space-between;
         background: #ffffff;
-        padding: 6px 10px;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border-radius: 8px;
         border: 1px solid #e2e8f0;
-        margin-bottom: 8px;
-        gap: 8px;
+        margin-bottom: 6px;
     }
 
-    /* Nút Quay lại Trang chủ cực kỳ nhỏ gọn */
-    .nav-back-btn div[data-testid="stButton"] > button {
+    /* Tinh chỉnh nút quay lại trang chủ nhỏ gọn */
+    div.nav-back-container button {
         background-color: #f1f5f9 !important;
         color: #334155 !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 6px !important;
         font-size: 10px !important;
-        padding: 2px 6px !important;
+        padding: 2px 8px !important;
         font-weight: 600 !important;
         width: auto !important;
         margin: 0 !important;
     }
 
-    /* TIÊU ĐỀ TRANG SAU */
-    h1 {
-        font-size: 13px !important;
+    /* TIÊU ĐỀ TRANG SAU NẰM CÙNG HÀNG */
+    .nav-title-text {
+        font-size: 12px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
         margin: 0 !important;
-        padding: 0 !important;
-        flex-grow: 1;
         text-align: right;
-    }
-
-    h2, h3 {
-        font-size: 11px !important;
-        font-weight: 600 !important;
-        color: #334155 !important;
     }
 
     /* NỘI DUNG VÀ BẢNG DỮ LIỆU: CHUẨN 10.5px GỌN GÀNG KHÍT MÀN HÌNH */
@@ -302,7 +294,7 @@ def navigate_to(page_name):
     st.session_state.current_page = page_name
     st.rerun()
 
-# --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH (NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM CHUNG 1 HÀNG GỌN GÀNG) ---
+# --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH (NÚT QUAY LẠI SÁT TIÊU ĐỀ NỘI DUNG) ---
 if st.session_state.current_page != "Trang Chủ":
     page_titles = {
         "Bảng Tin": "📢 Bảng Tin & Thông Báo",
@@ -318,18 +310,16 @@ if st.session_state.current_page != "Trang Chủ":
     }
     current_title = page_titles.get(st.session_state.current_page, st.session_state.current_page)
     
-    st.markdown(f"""
-        <div class="nav-header-container">
-            <div class="nav-back-btn" id="back-btn-wrapper"></div>
-            <h1>{current_title}</h1>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col_back, _ = st.columns([1, 4])
-    with col_back:
+    # Bố trí nút quay lại và tiêu đề nằm trọn trong 1 thanh nhỏ gọn phía trên
+    col_nav_btn, col_nav_title = st.columns([1.2, 3.8])
+    with col_nav_btn:
+        st.markdown('<div class="nav-back-container">', unsafe_allow_html=True)
         if st.button("⬅️ Trang chủ", key="btn_back_home"):
             navigate_to("Trang Chủ")
-    st.markdown("<div style='margin-bottom: 4px;'></div>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    with col_nav_title:
+        st.markdown(f'<p class="nav-title-text">{current_title}</p>', unsafe_allow_html=True)
+    st.markdown("<hr style='margin: 4px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 # ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
@@ -345,7 +335,7 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- DANH SÁCH 10 NÚT DỊCH VỤ (ÉP CỨNG CHUẨN 3 NÚT / HÀNG) ---
+    # --- 10 NÚT DỊCH VỤ ĐƯỢC CHIA CHUẨN 3 NÚT / HÀNG NGANG ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
