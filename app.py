@@ -45,7 +45,7 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS GIAO DIỆN CỔNG DỊCH VỤ CÔNG HIỆN ĐẠI ---
+# --- CSS GIAO DIỆN TỐI ƯU (CĂN GIỮA BANNER & NÚT BO TRÒN 3 CỘT) ---
 st.markdown("""
 <style>
     /* Tổng thể nền trang */
@@ -53,56 +53,47 @@ st.markdown("""
         background-color: #f4f6f9;
     }
     
-    /* Header biểu ngữ đỏ */
+    /* Header biểu ngữ đỏ - căn giữa */
     .app-banner {
         background: linear-gradient(135deg, #d32f2f, #b71c1c);
         color: white;
-        padding: 16px 20px;
+        padding: 20px;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
-        margin-bottom: 20px;
-        position: relative;
+        margin-bottom: 25px;
+        text-align: center;
     }
     .app-banner h3 {
         margin: 0;
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
         letter-spacing: 0.5px;
     }
     .app-banner p {
-        margin: 5px 0 0 0;
+        margin: 6px 0 0 0;
         font-size: 13px;
         opacity: 0.95;
     }
     
-    /* Tiêu đề mục dịch vụ */
-    .section-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #333;
-        margin: 15px 0 10px 0;
-        border-left: 4px solid #d32f2f;
-        padding-left: 8px;
-    }
-    
-    /* Nút bấm dịch vụ dạng thẻ icon tròn */
+    /* Nút bấm dịch vụ dạng thẻ bo tròn gọn gàng (1 hàng 3 nút) */
     .stButton button {
         width: 100%;
         background-color: white;
         color: #333;
         border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        padding: 12px 8px;
+        border-radius: 25px; /* Bo tròn hoàn toàn */
+        padding: 10px 12px;
         font-size: 13px;
-        font-weight: 500;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         transition: all 0.2s ease;
         text-align: center;
+        margin-bottom: 8px;
     }
     .stButton button:hover {
         border-color: #d32f2f;
         color: #d32f2f;
-        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.1);
+        box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
         transform: translateY(-2px);
     }
 
@@ -233,7 +224,7 @@ if st.session_state.current_page != "Trang Chủ":
 # ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
     
-    # Banner nổi bật được tùy chỉnh theo yêu cầu
+    # Banner căn giữa
     st.markdown("""
         <div class="app-banner">
             <h3>KHU DÂN CƯ LĂNG TÔ</h3>
@@ -241,37 +232,36 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- NHÓM 1: THÔNG TIN & TRUYỀN THÔNG ---
-    st.markdown('<div class="section-title">📢 Thông Tin & Tra Cứu Cộng Đồng</div>', unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns(4)
+    # --- DANH SÁCH NÚT DỊCH VỤ (BỐ TRÍ 3 CỘT / HÀNG) ---
+    col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
     with col2:
         if st.button("📋 Danh Bạ", use_container_width=True): navigate_to("Danh Bạ Thôn")
     with col3:
         if st.button("🎉 Sự Kiện", use_container_width=True): navigate_to("Sự Kiện")
+
+    col4, col5, col6 = st.columns(3)
     with col4:
         if st.button("💰 Thu Chi", use_container_width=True): navigate_to("Công Khai Thu Chi")
-
-    # --- NHÓM 2: DỊCH VỤ TƯƠNG TÁC & TIỆN ÍCH ---
-    st.markdown('<div class="section-title">📝 Dịch Vụ Hướng Dẫn & Tương Tác</div>', unsafe_allow_html=True)
-    col5, col6, col7, col8 = st.columns(4)
     with col5:
         if st.button("📝 Đăng Ký", use_container_width=True): navigate_to("Đăng Ký Sự Kiện")
     with col6:
         if st.button("⚠️ Phản Ánh", use_container_width=True): navigate_to("Phản Ánh Kiến Nghị")
+
+    col7, col8, col9 = st.columns(3)
     with col7:
         if st.button("🏆 Vinh Danh", use_container_width=True): navigate_to("Vinh Danh Khen Thưởng")
     with col8:
         if st.button("🛒 Chợ Quê", use_container_width=True): navigate_to("Chợ Quê Nông Sản")
-
-    # --- NHÓM 3: QUẢN LÝ VÀ TIỆN ÍCH KHÁC ---
-    st.markdown('<div class="section-title">⚙️ Tiện Ích Khác & Quản Trị</div>', unsafe_allow_html=True)
-    col9, col10 = st.columns(2)
     with col9:
-        if st.button("📅 Đặt Lịch Văn Hóa", use_container_width=True): navigate_to("Đặt Lịch Nhà Văn Hóa")
-    with col10:
+        if st.button("📅 Đặt Lịch", use_container_width=True): navigate_to("Đặt Lịch Nhà Văn Hóa")
+
+    # Nút Quản Trị đặt riêng dòng dưới cùng để dễ thao tác
+    col10, col11, col12 = st.columns(3)
+    with col11:
         if st.button("🔐 Cán Bộ Quản Trị", use_container_width=True): navigate_to("Khu Vực Quản Trị Cán Bộ")
+
 
 # ================= CHI TIẾT CÁC TÍNH NĂNG =================
 
