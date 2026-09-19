@@ -65,7 +65,7 @@ st.markdown("""
 
 # Khởi tạo kết nối Google Sheets chuẩn st.connection
 try:
-    conn = st.connection("gsheets", type="GsheetsConnection")
+    conn = st.connection("gsheets", type=GsheetsConnection)
 except Exception as e:
     st.error(f"Lỗi kết nối GsheetsConnection: {e}. Vui lòng kiểm tra lại mục Secrets trên Streamlit Cloud.")
     st.stop()
