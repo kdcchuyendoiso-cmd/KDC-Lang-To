@@ -192,6 +192,46 @@ def display_df_with_1_index(df):
     else:
         st.info("💡 Bảng này hiện chưa có dữ liệu.")
 
+# --- HÀM TÍNH TOÁN CỘNG DỒN TỰ ĐỘNG SỐ LƯỢNG ĐĂNG KÝ ---
+def get_updated_events_df():
+    df_sk = load_excel_data("SuKien")
+    df_dk = load_excel_data("DangKySuKien")
+    
+    if df_sk.empty:
+        return df_sk
+        
+    # Tạo bản sao để không ảnh hưởng dữ liệu gốc khi chưa lưu
+    df_sk_calc = df_sk.copy()
+    
+    if not df_dk.empty and 'Tên Sự Kiện' in df_dk.columns:
+        # Chuẩn hóa cột số lượng đăng ký thành dạng số để cộng dồn
+        if 'Số Lượng' in df_dk.columns:
+            df_dk['Số Lượng_num'] = pd.to_numeric(df_dk['Số Lượng'], errors='coerce').fillna(1)
+        else:
+            df_dk['Số Lượng_num'] = 1
+            
+        # Gom nhóm theo tên sự kiện và tính tổng số lượng đăng ký
+        sum_dk = df_dk.groupby('Tên Sự Kiện')['Số Lượng_num'].sum().reset_index()
+        
+        # Cập nhật cột Tổng Số Hộ Tham Gia dựa trên tên sự kiện khớp nhau
+        for idx, row in df_sk_calc.iterrows():
+            ten_sk = row.get('Tên Sự Kiện', '')
+            matched = sum_dk[sum_dk['Tên Sự Kiện'].str.strip() == ten_sk.strip()]
+            if not matched.empty:
+                df_sk_calc.loc[idx, 'Tổng Số Hộ Tham Gia'] = str(int(matched['Số Lượng_num'].values[0]))
+            else:
+                # Nếu chưa có ai đăng ký thì hiển thị 0 hoặc giữ nguyên nếu đã có sẵn giá trị
+                current_val = str(row.get('Tổng Số Hộ Tham Gia', ''))
+                if current_val in ['', 'nan', 'None']:
+                    df_sk_calc.loc[idx, 'Tổng Số Hộ Tham Gia'] = '0'
+    else:
+        for idx, row in df_sk_calc.iterrows():
+            current_val = str(row.get('Tổng Số Hộ Tham Gia', ''))
+            if current_val in ['', 'nan', 'None']:
+                df_sk_calc.loc[idx, 'Tổng Số Hộ Tham Gia'] = '0'
+                
+    return df_sk_calc
+
 # --- THANH BÊN (SIDEBAR) ---
 with st.sidebar:
     st.markdown("""
@@ -244,16 +284,15 @@ elif "2. 📋 Danh Bạ Thôn" in choice:
 
 elif "3. 🎉 Sự Kiện Cộng Đồng" in choice:
     st.header("🎉 Sự Kiện Cộng Đồng")
-    df_sk = load_excel_data("SuKien")
-    display_df_with_1_index(df_sk)
+    df_sk_hien_thi = get_updated_events_df()
+    display_df_with_1_index(df_sk_hien_thi)
 
 elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
     st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
     df_sk = load_excel_data("SuKien")
-    df_dk = load_excel_data("DangKySuKien")
     
-    # Giữ nguyên bản sự kiện gốc (chỉ hiển thị cột Tổng Số Hộ Tham Gia có sẵn trong SuKien, loại bỏ cột Số lượng đăng ký thừa)
-    df_sk_hien_thi = df_sk.copy()
+    # Hiển thị bảng sự kiện đã cộng dồn số lượng đăng ký tự động
+    df_sk_hien_thi = get_updated_events_df()
 
     st.subheader("📅 Danh sách sự kiện & Tổng số hộ tham gia")
     display_df_with_1_index(df_sk_hien_thi)
@@ -279,6 +318,10 @@ elif "4. 📝 Đăng Ký & Điểm Danh" in choice:
                     "Ngày Đăng Ký": str(datetime.date.today())
                 }
                 if save_row_to_excel("DangKySuKien", data_dang_ky):
+                    # Đồng thời cập nhật lại cột Tổng Số Hộ Tham Gia vào bảng SuKien trong file Excel
+                    updated_sk_for_save = get_updated_events_df()
+                    save_entire_sheet("SuKien", updated_sk_for_save)
+                    
                     st.success(f"Cảm ơn hộ gia đình '{ho_ten_ho}'! Đã ghi nhận đăng ký thành công.")
                     st.rerun()
 
@@ -411,7 +454,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
             "📅 Đặt Lịch & Chợ Quê"
         ])
         
-        # TAB 3: QUẢN TRỊ SỰ KIỆN (Bảng chỉnh sửa tự do toàn bộ)
+        # TAB 3: QUẢN TRỊ SỰ KIỆN
         with tab_q3:
             st.subheader("🎉 Quản lý & Cập nhật Sự Kiện Cộng Đồng")
             st.info("💡 Bạn có thể click trực tiếp vào các ô bên dưới để sửa nội dung, thêm dòng mới ở cuối bảng hoặc bấm vào biểu tượng thùng rác để xóa dòng.")
