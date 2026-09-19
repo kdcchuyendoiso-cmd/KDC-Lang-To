@@ -45,7 +45,7 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS TỐI ƯU GIAO DIỆN & ÉP BẮT BUỘC 3 NÚT TRÊN 1 HÀNG TRÊN MỌI THIẾT BỊ ---
+# --- CSS TỐI ƯU GIAO DIỆN & ÉP CỨNG CHUẨN 3 NÚT TRÊN 1 HÀNG TRÊN MỌI THIẾT BỊ DI ĐỘNG ---
 st.markdown("""
 <style>
     /* Ép toàn bộ container full màn hình, chống tràn viền */
@@ -93,7 +93,7 @@ st.markdown("""
         opacity: 0.9;
     }
 
-    /* ÉP CỨNG CHUẨN 3 CỘT TRÊN MỌI MÀN HÌNH ĐIỆN THOẠI KHÔNG BỊ XUỐNG DÒNG */
+    /* ÉP BẮT BUỘC KHÔNG BỊ XUỐNG DÒNG: 3 CỘT / HÀNG TRÊN ĐIỆN THOẠI */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
@@ -135,19 +135,7 @@ st.markdown("""
     }
 
     /* KHU VỰC ĐIỀU HƯỚNG: NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM SÁT GỌN GÀNG CÙNG 1 HÀNG */
-    .nav-header-box {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #ffffff;
-        padding: 4px 8px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        margin-bottom: 6px;
-    }
-
-    /* Tinh chỉnh nút quay lại trang chủ nhỏ gọn */
-    div.nav-back-container button {
+    .nav-back-container button {
         background-color: #f1f5f9 !important;
         color: #334155 !important;
         border: 1px solid #cbd5e1 !important;
@@ -159,7 +147,6 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* TIÊU ĐỀ TRANG SAU NẰM CÙNG HÀNG */
     .nav-title-text {
         font-size: 12px !important;
         font-weight: 700 !important;
@@ -310,7 +297,6 @@ if st.session_state.current_page != "Trang Chủ":
     }
     current_title = page_titles.get(st.session_state.current_page, st.session_state.current_page)
     
-    # Bố trí nút quay lại và tiêu đề nằm trọn trong 1 thanh nhỏ gọn phía trên
     col_nav_btn, col_nav_title = st.columns([1.2, 3.8])
     with col_nav_btn:
         st.markdown('<div class="nav-back-container">', unsafe_allow_html=True)
@@ -335,7 +321,7 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- 10 NÚT DỊCH VỤ ĐƯỢC CHIA CHUẨN 3 NÚT / HÀNG NGANG ---
+    # --- HÀNG 1 (3 NÚT) ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
@@ -344,6 +330,7 @@ if st.session_state.current_page == "Trang Chủ":
     with col3:
         if st.button("🎉 Sự Kiện", use_container_width=True): navigate_to("Sự Kiện")
 
+    # --- HÀNG 2 (3 NÚT) ---
     col4, col5, col6 = st.columns(3)
     with col4:
         if st.button("💰 Thu Chi", use_container_width=True): navigate_to("Công Khai Thu Chi")
@@ -352,6 +339,7 @@ if st.session_state.current_page == "Trang Chủ":
     with col6:
         if st.button("⚠️ Phản Ánh", use_container_width=True): navigate_to("Phản Ánh Kiến Nghị")
 
+    # --- HÀNG 3 (3 NÚT) ---
     col7, col8, col9 = st.columns(3)
     with col7:
         if st.button("🏆 Vinh Danh", use_container_width=True): navigate_to("Vinh Danh Khen Thưởng")
@@ -360,6 +348,7 @@ if st.session_state.current_page == "Trang Chủ":
     with col9:
         if st.button("📅 Đặt Lịch", use_container_width=True): navigate_to("Đặt Lịch Nhà Văn Hóa")
 
+    # --- HÀNG 4: NÚT QUẢN TRỊ ĐẶC BIỆT ---
     col10, col11, col12 = st.columns(3)
     with col11:
         if st.button("🔐 Quản Trị", use_container_width=True): navigate_to("Khu Vực Quản Trị Cán Bộ")
