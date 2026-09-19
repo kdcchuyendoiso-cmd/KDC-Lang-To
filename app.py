@@ -31,185 +31,7 @@ from helpers import (
     valid_phone,
     year_of,
 )
-
-# =====================================================================
-# Khởi tạo CSS chuẩn bọc trong thẻ <style> để không bị lỗi hiện text
-# =====================================================================
-APP_CSS = """
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
-
-:root {
-    color-scheme: light;
-    --brand: #2559d8;
-    --brand-dark: #17346b;
-    --brand-soft: #e6efff;
-    --bg: #f2f5fa;
-    --card: #ffffff;
-    --ink: #0f1b33;
-    --muted: #5f6f89;
-    --line: #e3e9f3;
-    --ok: #2b8552;
-    --ok-soft: #dff4e8;
-    --bad: #d64545;
-    --bad-soft: #fde6e4;
-    --warn: #9a5f03;
-    --warn-soft: #fff1d1;
-    --radius: 18px;
-    --shadow: 0 1px 2px rgba(15,27,51,.05), 0 8px 22px rgba(15,27,51,.06);
-}
-
-html, body, .stApp, .stApp p, .stApp label, .stApp input, .stApp textarea, .stApp button, .stApp li, .stApp h1, .stApp h2, .stApp h3, .stApp [data-baseweb="select"] *, .stApp [data-testid="stMarkdownContainer"] {
-    font-family: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
-}
-
-html {
-    -webkit-text-size-adjust: 100%;
-}
-
-.stApp {
-    background: var(--bg);
-    color: var(--ink);
-}
-
-#MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], [data-testid="stAppDeployButton"] {
-    display: none !important;
-}
-
-[data-testid="stHeader"] {
-    background: transparent !important;
-    height: 0 !important;
-    min-height: 0 !important;
-}
-
-.home-hero {
-    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-    color: white;
-    padding: 24px 20px;
-    border-radius: var(--radius);
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
-    text-align: center;
-}
-.hh-title { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
-.hh-sub { font-size: 14px; opacity: 0.9; }
-
-.tile {
-    display: flex;
-    align-items: center;
-    background: var(--card);
-    padding: 14px 16px;
-    border-radius: var(--radius);
-    margin-bottom: 12px;
-    box-shadow: var(--shadow);
-    text-decoration: none;
-    border: 1px solid var(--line);
-    transition: transform 0.1s ease;
-}
-.tile:active { transform: scale(0.98); }
-.tile-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-right: 14px;
-    flex-shrink: 0;
-}
-.tile-text { flex-grow: 1; }
-.tile-title { font-size: 15px; font-weight: 700; color: var(--ink); }
-.tile-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-.card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--line);
-}
-.card.pinned { border-left: 4px solid var(--brand); }
-.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.card-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
-.card-body { font-size: 14px; color: var(--ink); line-height: 1.5; }
-.card-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); margin-top: 10px; }
-
-.badge {
-    background: var(--brand-soft);
-    color: var(--brand);
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-}
-.badge.warn { background: var(--warn-soft); color: var(--warn); }
-.badge.ok { background: var(--ok-soft); color: var(--ok); }
-.badge.gray { background: var(--line); color: var(--muted); }
-
-.page-head {
-    display: flex;
-    align-items: center;
-    background: var(--card);
-    padding: 14px 16px;
-    border-radius: var(--radius);
-    margin-bottom: 16px;
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow);
-}
-.back {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--brand);
-    text-decoration: none;
-    margin-right: 14px;
-    line-height: 1;
-}
-.ph-title { font-size: 16px; font-weight: 700; color: var(--ink); }
-.ph-sub { font-size: 12px; color: var(--muted); }
-
-.nav-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--card);
-    display: flex;
-    justify-content: space-around;
-    padding: 8px 0;
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-    z-index: 999;
-}
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 600;
-}
-.nav-item.active { color: var(--brand); }
-.nav-item span { font-size: 18px; margin-bottom: 2px; }
-
-.empty { text-align: center; padding: 32px 16px; color: var(--muted); }
-.e-ico { font-size: 36px; margin-bottom: 8px; }
-
-.btn-link {
-    display: inline-block;
-    background: var(--brand-soft);
-    color: var(--brand);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    margin-top: 10px;
-}
-</style>
-"""
+from styles import APP_CSS
 
 st.set_page_config(
     page_title="Khu dân cư Lăng Tô",
@@ -218,19 +40,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-st.markdown(APP_CSS, unsafe_allow_html=True)
-
-st.markdown("""
-    <style>
-    .stTextInput div[data-baseweb="input"]::after,
-    .stTextArea textarea ~ div {
-        display: none !important;
-    }
-    div[data-testid="InputInstructions"] {
-        display: none !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 # =====================================================================
 # Cấu hình các trang
@@ -242,7 +51,7 @@ class Page:
     short: str
     title: str
     subtitle: str
-    bg: str
+    bg: str  # màu nền ô biểu tượng
     fg: str
 
 
@@ -262,7 +71,7 @@ PAGES: dict[str, Page] = {
     ]
 }
 TILE_SLUGS = [s for s in PAGES if s != "quan-tri"]
-NAV_SLUGS = ["bang-tin", "su-kien", "danh-ba", "phan-anh"]
+NAV_SLUGS = ["bang-tin", "su-kien", "danh-ba", "phan-anh"]  # 4 mục + Trang chủ trên thanh dưới
 
 
 # =====================================================================
@@ -276,7 +85,7 @@ def _bootstrap() -> bool:
 
 try:
     _bootstrap()
-except Exception as _exc:
+except Exception as _exc:  # ví dụ: hệ thống tệp chỉ đọc
     st.error(f"Không tạo được file dữ liệu: {_exc}")
     st.stop()
 
@@ -287,10 +96,12 @@ def _cached(sheet: str, stamp: tuple[int, int]) -> pd.DataFrame:
 
 
 def load(sheet: str) -> pd.DataFrame:
+    """Đọc một sheet; tự làm mới khi file Excel thay đổi."""
     return _cached(sheet, db.file_stamp())
 
 
 def events_with_counts() -> pd.DataFrame:
+    """Bảng sự kiện, cột 'Tổng Số Hộ Tham Gia' được tính lại từ các đăng ký."""
     events = load("SuKien")
     regs = load("DangKySuKien")
     if events.empty or regs.empty:
@@ -314,6 +125,7 @@ def html_block(markup: str) -> None:
 
 
 def link(slug: str, **params: str) -> str:
+    """Địa chỉ nội bộ (?page=...), đã escape để đặt trong thuộc tính href."""
     query = "&".join([f"page={slug}"] + [f"{k}={quote(str(v))}" for k, v in params.items()])
     return esc("?" + query)
 
@@ -324,6 +136,7 @@ def empty(title: str, hint: str = "", icon: str = "📭") -> None:
 
 
 def flash(kind: str, message: str) -> None:
+    """Lưu thông báo để hiện ở lần chạy kế tiếp (sau st.rerun)."""
     st.session_state["_flash"] = (kind, message)
 
 
@@ -349,6 +162,18 @@ def page_header(page: Page) -> None:
     )
 
 
+def bottom_nav(active: str) -> None:
+    items = [("home", "🏠", "Trang chủ")] + [(s, PAGES[s].icon, PAGES[s].short) for s in NAV_SLUGS]
+    parts = []
+    for slug, icon, label in items:
+        cls = "on" if slug == active else ""
+        parts.append(
+            f'<a class="{cls}" href="{link(slug)}" target="_self">'
+            f'<span class="i">{icon}</span><span>{esc(label)}</span></a>'
+        )
+    html_block(f'<div class="bottom-nav">{"".join(parts)}</div>')
+
+
 def cal_chip(value: str) -> str:
     d = parse_date(value)
     if not d:
@@ -357,7 +182,7 @@ def cal_chip(value: str) -> str:
 
 
 # =====================================================================
-# Các trang nội dung
+# Bảng tin
 # =====================================================================
 def sorted_news(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
@@ -399,9 +224,12 @@ def page_news() -> None:
     html_block("".join(news_card(r) for _, r in df.iterrows()))
 
 
+# =====================================================================
+# Danh bạ
+# =====================================================================
 def person_card(r) -> str:
     phone = clean_phone(r["Số Điện Thoại"])
-    call = f'<a class="btn-link" href="tel:{phone}" target="_self">📞 Gọi</a>' if phone else ""
+    call = f'<a class="callbtn" href="tel:{phone}" target="_self">📞 Gọi</a>' if phone else ""
     officer = '<span class="badge">Cán bộ</span>' if is_yes(r["Cán Bộ"]) else ""
     phone_line = f'<div class="phone">{esc(format_phone(phone))}</div>' if phone else ""
     return f"""
@@ -438,6 +266,9 @@ def page_contacts() -> None:
     html_block("".join(person_card(r) for _, r in df.iterrows()))
 
 
+# =====================================================================
+# Sự kiện
+# =====================================================================
 def page_events() -> None:
     df = events_with_counts()
     if df.empty:
@@ -496,6 +327,9 @@ def page_events() -> None:
     html_block("".join(cards))
 
 
+# =====================================================================
+# Đăng ký sự kiện
+# =====================================================================
 def page_register() -> None:
     events = events_with_counts()
     names = [n.strip() for n in events["Tên Sự Kiện"] if n.strip()] if not events.empty else []
@@ -545,6 +379,9 @@ def page_register() -> None:
     html_block(f'<div class="card ledger">{"".join(rows)}</div>')
 
 
+# =====================================================================
+# Công khai thu chi
+# =====================================================================
 def page_finance() -> None:
     df = load("CongKhaiThuChi")
     if df.empty:
@@ -599,6 +436,9 @@ def page_finance() -> None:
     html_block(f'<div class="card ledger">{"".join(rows)}</div>')
 
 
+# =====================================================================
+# Phản ánh, kiến nghị
+# =====================================================================
 def page_feedback() -> None:
     html_block(
         '<div class="card-body" style="margin:0 2px 12px">'
@@ -634,6 +474,9 @@ def page_feedback() -> None:
         st.success("Đã gửi phản ánh đến cán bộ thôn. Cảm ơn bà con!")
 
 
+# =====================================================================
+# Vinh danh
+# =====================================================================
 def page_honors() -> None:
     df = load("VinhDanh")
     if df.empty:
@@ -667,6 +510,9 @@ def page_honors() -> None:
     html_block("".join(cards))
 
 
+# =====================================================================
+# Chợ quê nông sản
+# =====================================================================
 def product_card(r) -> str:
     price = parse_money(r["Giá Bán"])
     unit = r["Đơn Vị"].strip()
@@ -710,7 +556,7 @@ def page_market() -> None:
             if query.strip():
                 needle = fold(query)
                 df = df[df["Tên Sản Phẩm"].map(lambda v: needle in fold(v))]
-            df = df.iloc[::-1]
+            df = df.iloc[::-1]  # mới đăng lên trước
             if df.empty:
                 empty("Không tìm thấy sản phẩm", "Thử từ khóa khác.", "🔍")
             else:
@@ -719,7 +565,7 @@ def page_market() -> None:
         with st.form("form_cho_que", clear_on_submit=True):
             ten = st.text_input("Tên sản phẩm *", max_chars=100)
             loai = st.selectbox("Phân loại", ["Nông sản", "Thực phẩm", "Thủ công mỹ nghệ", "Đồ dùng gia đình"])
-            gia = st.number_input("Giá bán (VNĐ)", min_value=0, step=1000, value=0)
+            gia = st.number_input("Giá bán (VNĐ)", min_value=0, step=1000, value=0, help="Để 0 nếu muốn người mua liên hệ để hỏi giá.")
             don_vi = st.text_input("Đơn vị tính", placeholder="kg, bó, lít, chục...", max_chars=20)
             sdt = st.text_input("Số điện thoại liên hệ *", placeholder="09xx xxx xxx", max_chars=20)
             submitted = st.form_submit_button("Đăng bán sản phẩm")
@@ -744,10 +590,13 @@ def page_market() -> None:
                 except Exception as exc:
                     st.error(f"Chưa đăng được sản phẩm, vui lòng thử lại. ({exc})")
                 else:
-                    flash("success", "Đã đăng bán sản phẩm.")
+                    flash("success", "Đã đăng bán sản phẩm. Bà con có thể xem ở tab 'Xem nông sản'.")
                     st.rerun()
 
 
+# =====================================================================
+# Đặt lịch nhà văn hóa
+# =====================================================================
 def booking_card(r) -> str:
     status = r["Trạng Thái"].strip() or "Chờ duyệt"
     purpose = f'<div class="card-meta"><span>{esc(r["Mục Đích"])}</span></div>' if r["Mục Đích"].strip() else ""
@@ -772,13 +621,21 @@ def page_booking() -> None:
         ho_ten = st.text_input("Họ và tên người đăng ký *", max_chars=80)
         dich_vu = st.selectbox("Loại dịch vụ", ["Mượn Nhà văn hóa", "Mượn bàn ghế / loa đài", "Đăng ký họp thôn"])
         ngay = st.date_input("Ngày sử dụng", min_value=today, value=today, format="DD/MM/YYYY")
-        muc_dich = st.text_area("Mục đích sử dụng", placeholder="Ví dụ: tổ chức đám cưới...", max_chars=500, height=100)
+        muc_dich = st.text_area("Mục đích sử dụng", placeholder="Ví dụ: tổ chức đám cưới, họp tổ dân phố...", max_chars=500, height=100)
         submitted = st.form_submit_button("Gửi yêu cầu đặt lịch")
 
     if submitted:
         if not ho_ten.strip():
             st.warning("Vui lòng nhập họ và tên người đăng ký.")
         else:
+            busy = (
+                not df.empty
+                and (
+                    (df["Dịch Vụ"].str.strip() == dich_vu)
+                    & (df["Ngày Sử Dụng"].map(lambda v: parse_date(v) == ngay))
+                    & ~df["Trạng Thái"].map(lambda s: status_class(s) == "bad")
+                ).any()
+            )
             try:
                 db.append_row(
                     "DatLichNhaVanHoa",
@@ -793,7 +650,10 @@ def page_booking() -> None:
             except Exception as exc:
                 st.error(f"Chưa gửi được yêu cầu, vui lòng thử lại. ({exc})")
             else:
-                flash("success", "Đã gửi yêu cầu đặt lịch. Vui lòng chờ cán bộ duyệt.")
+                if busy:
+                    flash("warning", "Đã gửi yêu cầu. Lưu ý: ngày này đã có người đăng ký cùng dịch vụ, cán bộ sẽ liên hệ để sắp xếp.")
+                else:
+                    flash("success", "Đã gửi yêu cầu đặt lịch. Vui lòng chờ cán bộ duyệt.")
                 st.rerun()
 
     html_block('<div class="sec"><b>Lịch sắp tới</b></div>')
@@ -807,13 +667,18 @@ def page_booking() -> None:
         empty("Chưa có lịch sắp tới", "", "📅")
     else:
         html_block("".join(booking_card(r) for _, r in upcoming.iterrows()))
+    past = df[df["_d"] < today].sort_values("_d", ascending=False, kind="stable")
+    if not past.empty:
+        with st.expander(f"Lịch đã qua ({len(past)})"):
+            html_block("".join(booking_card(r) for _, r in past.head(30).iterrows()))
 
 
 # =====================================================================
-# Khu vực cán bộ (Quản trị)
+# Khu vực cán bộ
 # =====================================================================
 DEFAULT_PASSWORD = "admin123"
 BACKUP_LABEL = "🗄️ Sao lưu & khôi phục"
+
 
 def admin_password() -> str:
     try:
@@ -821,6 +686,7 @@ def admin_password() -> str:
     except Exception:
         secret = None
     return str(secret or os.environ.get("ADMIN_PASSWORD") or DEFAULT_PASSWORD)
+
 
 ADMIN_SECTIONS: dict[str, str] = {
     "📢 Thông báo": "ThongBao",
@@ -833,28 +699,32 @@ ADMIN_SECTIONS: dict[str, str] = {
     "🛒 Chợ quê": "ChoQue",
     "📅 Đặt lịch": "DatLichNhaVanHoa",
 }
-
+# Cột chọn từ danh sách: giá trị đầu tiên là mặc định khi ô để trống
 ADMIN_SELECTS: dict[str, dict[str, list[str]]] = {
     "ThongBao": {"Ghim Nổi Bật": ["Không", "Có"]},
     "DanhBaThon": {"Cán Bộ": ["Không", "Có"]},
     "PhanAnh": {"Trạng Thái": ["Chờ xử lý", "Đang xử lý", "Đã xử lý", "Từ chối"]},
     "DatLichNhaVanHoa": {"Trạng Thái": ["Chờ duyệt", "Đã duyệt", "Từ chối"]},
 }
-
 ADMIN_WIDE = {"ThongBao": ["Nội Dung"], "SuKien": ["Mô Tả"], "PhanAnh": ["Nội Dung"]}
 
+
 def admin_editor_data(sheet: str) -> tuple[pd.DataFrame, dict]:
+    """Dữ liệu + cấu hình cột cho bảng chỉnh sửa (ô chọn từ danh sách, cột rộng)."""
     cc = st.column_config
     df = load(sheet).copy()
     config: dict = {col: cc.TextColumn(width="large") for col in ADMIN_WIDE.get(sheet, [])}
     for col, options in ADMIN_SELECTS.get(sheet, {}).items():
         df[col] = df[col].map(lambda v, first=options[0]: v.strip() or first)
-        extra = [v for v in df[col].unique() if v not in options]
+        extra = [v for v in df[col].unique() if v not in options]  # giữ nguyên giá trị cũ ngoài danh sách
         config[col] = cc.SelectboxColumn(options=options + extra)
     return df, config
 
+
 def admin_backup() -> None:
-    st.caption("Nên tải file sao lưu định kỳ để phòng mất dữ liệu.")
+    st.caption(
+        "Nên tải file sao lưu định kỳ. Trên một số máy chủ miễn phí, dữ liệu có thể bị xóa khi ứng dụng khởi động lại."
+    )
     st.download_button(
         "⬇️ Tải file Excel sao lưu",
         data=db.export_bytes(),
@@ -864,7 +734,7 @@ def admin_backup() -> None:
     st.markdown("**Khôi phục từ file sao lưu**")
     upload = st.file_uploader("Chọn file .xlsx", type=["xlsx"], label_visibility="collapsed")
     if upload is not None:
-        agree = st.checkbox("Tôi hiểu: toàn bộ dữ liệu hiện tại sẽ bị thay bằng file này.")
+        agree = st.checkbox("Tôi hiểu: toàn bộ dữ liệu hiện tại sẽ được thay bằng file này.")
         if st.button("Khôi phục dữ liệu", disabled=not agree):
             try:
                 db.restore_from_bytes(upload.getvalue())
@@ -873,6 +743,7 @@ def admin_backup() -> None:
             else:
                 flash("success", "Đã khôi phục dữ liệu từ file Excel.")
                 st.rerun()
+
 
 def page_admin() -> None:
     if not st.session_state.get("is_admin"):
@@ -884,12 +755,12 @@ def page_admin() -> None:
                 st.session_state["is_admin"] = True
                 st.rerun()
             else:
-                time.sleep(1)
+                time.sleep(1)  # làm chậm việc dò mật khẩu
                 st.error("Mật khẩu chưa đúng. Vui lòng thử lại.")
         return
 
     if admin_password() == DEFAULT_PASSWORD:
-        st.warning("Đang dùng mật khẩu mặc định. Hãy cấu hình lại bảo mật nếu cần.")
+        st.warning("Đang dùng mật khẩu mặc định. Hãy đặt ADMIN_PASSWORD trong Secrets để bảo mật (xem README).")
     if st.button("Đăng xuất"):
         st.session_state["is_admin"] = False
         st.rerun()
@@ -901,91 +772,93 @@ def page_admin() -> None:
 
     sheet = ADMIN_SECTIONS[choice]
     data, config = admin_editor_data(sheet)
-    
+    st.caption("Bấm vào ô để sửa. Bấm dấu + cuối bảng để thêm dòng; chọn dòng rồi nhấn Delete để xóa. Nhớ bấm Lưu thay đổi.")
     edited = st.data_editor(data, num_rows="dynamic", hide_index=True, column_config=config, key=f"ed_{sheet}")
-    
-    if st.button("💾 Lưu thay đổi", type="primary", use_container_width=True):
+    if st.button("💾 Lưu thay đổi", key=f"save_{sheet}"):
         try:
             db.write_sheet(sheet, edited)
         except Exception as exc:
-            st.error(f"Lỗi khi lưu dữ liệu: {exc}")
+            st.error(f"Chưa lưu được: {exc}")
         else:
-            flash("success", "Đã lưu thay đổi thành công!")
+            flash("success", f"Đã lưu mục '{choice}'.")
             st.rerun()
 
 
 # =====================================================================
-# Trang chủ & Điều hướng chính
+# Trang chủ
 # =====================================================================
 def page_home() -> None:
+    news = sorted_news(load("ThongBao"))
+    n_news = len(news)
+    n_events = len(load("SuKien"))
+    n_contacts = len(load("DanhBaThon"))
+
     html_block(
-        """
-        <div class="home-hero">
-          <div class="hh-title">🏘️ Khu dân cư Lăng Tô</div>
-          <div class="hh-sub">Cổng thông tin và tiện ích cộng đồng</div>
+        f"""
+        <div class="hero">
+          <div class="hero-mark">🏡</div>
+          <div class="hero-title">Khu dân cư Lăng Tô</div>
+          <div class="hero-sub">Thông tin, sự kiện và tiếng nói của bà con trong khu dân cư.</div>
+          <div class="chips">
+            <a class="chip" href="{link('bang-tin')}" target="_self">📢 {n_news} thông báo</a>
+            <a class="chip" href="{link('su-kien')}" target="_self">🎉 {n_events} sự kiện</a>
+            <a class="chip" href="{link('danh-ba')}" target="_self">📋 {n_contacts} liên hệ</a>
+          </div>
         </div>
         """
     )
-    cols = st.columns(2)
-    for i, slug in enumerate(TILE_SLUGS):
-        p = PAGES[slug]
-        with cols[i % 2]:
-            html_block(
-                f"""
-                <a class="tile" href="{link(slug)}" target="_self">
-                  <div class="tile-icon" style="background:{p.bg}; color:{p.fg}">{p.icon}</div>
-                  <div class="tile-text">
-                    <div class="tile-title">{esc(p.short)}</div>
-                    <div class="tile-sub">{esc(p.title)}</div>
-                  </div>
-                </a>
-                """
-            )
+
+    tiles = "".join(
+        f'<a class="tile" href="{link(p.slug)}" target="_self">'
+        f'<span class="ico" style="background:{p.bg};color:{p.fg}">{p.icon}</span>'
+        f'<span class="lbl">{esc(p.short)}</span></a>'
+        for p in (PAGES[s] for s in TILE_SLUGS)
+    )
+    html_block(f'<div class="grid3">{tiles}</div>')
+
+    if not news.empty:
+        html_block(f'<div class="sec"><b>Tin mới nhất</b><a href="{link("bang-tin")}" target="_self">Xem tất cả</a></div>')
+        html_block(news_card(news.iloc[0]))
+
+    html_block(
+        f'<div class="admin-link"><a href="{link("quan-tri")}" target="_self">🔐 Khu vực cán bộ</a></div>'
+        '<div class="tip">Mẹo: mở menu trình duyệt và chọn “Thêm vào màn hình chính” để dùng như một ứng dụng.</div>'
+    )
+
+
+# =====================================================================
+# Điều hướng
+# =====================================================================
+ROUTES = {
+    "bang-tin": page_news,
+    "danh-ba": page_contacts,
+    "su-kien": page_events,
+    "thu-chi": page_finance,
+    "dang-ky": page_register,
+    "phan-anh": page_feedback,
+    "vinh-danh": page_honors,
+    "cho-que": page_market,
+    "dat-lich": page_booking,
+    "quan-tri": page_admin,
+}
+
+
+def current_slug() -> str:
+    slug = st.query_params.get("page", "home")
+    return slug if slug in ROUTES else "home"
 
 
 def main() -> None:
-    show_flash()
-
-    query_page = st.query_params.get("page", "home")
-    if query_page == "home" or query_page not in PAGES:
+    st.markdown("<style>" + APP_CSS + "</style>", unsafe_allow_html=True)
+    slug = current_slug()
+    if slug == "home":
+        show_flash()
         page_home()
     else:
-        page = PAGES[query_page]
-        page_header(page)
-        if query_page == "bang-tin":
-            page_news()
-        elif query_page == "danh-ba":
-            page_contacts()
-        elif query_page == "su-kien":
-            page_events()
-        elif query_page == "dang-ky":
-            page_register()
-        elif query_page == "thu-chi":
-            page_finance()
-        elif query_page == "phan-anh":
-            page_feedback()
-        elif query_page == "vinh-danh":
-            page_honors()
-        elif query_page == "cho-que":
-            page_market()
-        elif query_page == "dat-lich":
-            page_booking()
-        elif query_page == "quan-tri":
-            page_admin()
-
-    if query_page != "quan-tri":
-        html_block(
-            f"""
-            <div class="nav-bar">
-              <a class="nav-item {'active' if query_page == 'home' else ''}" href="{link('home')}" target="_self">🏠 <span>Trang chủ</span></a>
-              <a class="nav-item {'active' if query_page == 'bang-tin' else ''}" href="{link('bang-tin')}" target="_self">📢 <span>Bảng tin</span></a>
-              <a class="nav-item {'active' if query_page == 'su-kien' else ''}" href="{link('su-kien')}" target="_self">🎉 <span>Sự kiện</span></a>
-              <a class="nav-item {'active' if query_page == 'danh-ba' else ''}" href="{link('danh-ba')}" target="_self">📋 <span>Danh bạ</span></a>
-              <a class="nav-item {'active' if query_page == 'quan-tri' else ''}" href="{link('quan-tri')}" target="_self">🔐 <span>Cán bộ</span></a>
-            </div>
-            """
-        )
+        page_header(PAGES[slug])
+        show_flash()
+        ROUTES[slug]()
+    bottom_nav(slug)
 
 
-if __name__ == "__main__":
-    main()
+main()
