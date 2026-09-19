@@ -794,20 +794,15 @@ def page_home() -> None:
     n_events = len(load("SuKien"))
     n_contacts = len(load("DanhBaThon"))
 
-    html_block(
-        f"""
-        <div class="hero">
-          <div class="hero-mark">🏡</div>
-          <div class="hero-title">Thôn Lăng Tô</div>
-          <div class="hero-sub">Quản lý & điều hành.</div>
-          <div class="chips">
-            <a class="chip" href="{link('bang-tin')}" target="_self">📢 {n_news} thông báo</a>
-            <a class="chip" href="{link('su-kien')}" target="_self">🎉 {n_events} sự kiện</a>
-            <a class="chip" href="{link('danh-ba')}" target="_self">📋 {n_contacts} liên hệ</a>
-          </div>
+    html_block("""
+    <div style="display: flex; align-items: center; gap: 16px; padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 16px; color: white;">
+        <div style="font-size: 48px; line-height: 1;">🏠</div>
+        <div style="text-align: center; flex: 1;">
+            <h2 style="margin: 0; font-size: 28px; font-weight: bold;">Thôn Lăng Tô</h2>
+            <p style="margin: 4px 0 0 0; font-size: 16px; opacity: 0.9;">Quản lý & điều hành</p>
         </div>
-        """
-    )
+    </div>
+""")
 
     tiles = "".join(
         f'<a class="tile" href="{link(p.slug)}" target="_self">'
