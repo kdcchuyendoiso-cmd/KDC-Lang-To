@@ -73,7 +73,7 @@ def load_gsheet_data(sheet_name):
             return pd.DataFrame()
         return data.dropna(how="all")
     except Exception as e:
-        st.warning(f"⚠️ Không đọc được Tab **'{sheet_name}'** từ Google Sheets. Chi tiết lỗi: {e}")
+        st.warning(f"⚠️ Không đọc được Tab **'{sheet_name}'** từ Google Sheets. Hãy kiểm tra quyền chia sẻ file và tên Tab. Chi tiết: {e}")
         return pd.DataFrame()
 
 def display_df_with_1_index(df):
@@ -119,7 +119,7 @@ st.sidebar.markdown("---")
 
 if "1. 📢 Bảng Tin & Thông Báo" in choice:
     st.header("📢 Bảng Tin & Thông Báo")
-    df_tb = load_gsheet_data("Thongbao")
+    df_tb = load_gsheet_data("ThongBao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
             ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
@@ -127,7 +127,7 @@ if "1. 📢 Bảng Tin & Thông Báo" in choice:
                 st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
                 st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
     else:
-        st.info("Chưa có thông báo nào hoặc không kết nối được bảng Thongbao.")
+        st.info("Chưa có thông báo nào hoặc không kết nối được bảng ThongBao.")
 
 elif "2. 📋 Danh Bạ Thôn" in choice:
     st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
@@ -243,7 +243,7 @@ elif "10. 🛠️ Khu Vực Quản Trị Cán Bộ" in choice:
 
         st.markdown("---")
         
-        df_tb = load_gsheet_data("Thongbao")
+        df_tb = load_gsheet_data("ThongBao")
         df_db = load_gsheet_data("DanhBaThon")
         df_sk = load_gsheet_data("SuKien")
         df_tc = load_gsheet_data("CongKhaiThuChi")
