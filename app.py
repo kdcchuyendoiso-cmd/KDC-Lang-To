@@ -41,17 +41,16 @@ st.set_page_config(
 )
 st.markdown("""
     <style>
-    /* 1. Ẩn Footer mặc định */
-    footer {visibility: hidden !important; display: none !important;}
+    /* Ẩn dòng chữ mờ "Press Enter to submit form" bên trong ô nhập liệu */
+    .stTextInput div[data-baseweb="input"]::after,
+    .stTextArea textarea ~ div {
+        display: none !important;
+    }
     
-    /* 2. Ẩn badge "Hosted with Streamlit" của Streamlit Cloud */
-    [data-testid="stViewerBadge"] {visibility: hidden !important; display: none !important;}
-    div[class*="viewerBadge"] {visibility: hidden !important; display: none !important;}
-    div[class*="stViewerBadge"] {visibility: hidden !important; display: none !important;}
-    
-    /* 3. Ẩn các liên kết chân trang dẫn tới Streamlit */
-    a[href*="streamlit.io"] {visibility: hidden !important; display: none !important;}
-    #stDecoration {display: none !important;}
+    /* Ẩn chữ gợi ý nhỏ phía dưới input nếu có */
+    div[data-testid="InputInstructions"] {
+        display: none !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
