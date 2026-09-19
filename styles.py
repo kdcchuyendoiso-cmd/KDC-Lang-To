@@ -3,8 +3,9 @@
 APP_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
-:root{
-  color-scheme: light;
+:root{ color-scheme: light; ... }
+/* Các dòng CSS khác của bạn */
+"""
   --brand:#2559d8; --brand-dark:#17346b; --brand-soft:#e6efff;
   --bg:#f2f5fa; --card:#ffffff; --ink:#0f1b33; --muted:#5f6f89; --line:#e3e9f3;
   --ok:#2b8552; --ok-soft:#dff4e8; --bad:#d64545; --bad-soft:#fde6e4;
