@@ -41,14 +41,11 @@ st.set_page_config(
 )
 st.markdown("""
     <style>
-    /* Ẩn footer chứa chữ Created with Streamlit và biểu tượng chiếc mũ */
-    footer {visibility: hidden;}
-    
-    /* Ẩn menu 3 gạch ở góc trên phải (nếu bạn muốn giao diện gọn như app thuần) */
-    #MainMenu {visibility: hidden;}
-    
-    /* Ẩn thanh header mặc định của Streamlit */
-    header {visibility: hidden;}
+    /* Ẩn triệt để footer, thanh hosted và các thành phần bản quyền của Streamlit */
+    footer {visibility: hidden !important; display: none !important;}
+    .viewerBadge_container__1QSob {visibility: hidden !important; display: none !important;}
+    #stDecoration {display: none !important;}
+    div[data-testid="stStatusWidget"] {visibility: hidden !important; display: none !important;}
     </style>
 """, unsafe_allow_html=True)
 
