@@ -45,14 +45,14 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS TỐI ƯU GIAO DIỆN CHUYÊN NGHIỆP (3 CỘT ĐỐI XỨNG & FONT CHUẨN MOBILE) ---
+# --- CSS TỐI ƯU GIAO DIỆN CHUYÊN NGHIỆP & ÉP CỨNG 3 NÚT TRÊN 1 HÀNG ---
 st.markdown("""
 <style>
     /* Ép toàn bộ container full màn hình, chống tràn viền */
     .block-container {
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
-        padding-top: 0.75rem !important;
+        padding-top: 0.5rem !important;
         max-width: 100% !important;
     }
 
@@ -64,42 +64,49 @@ st.markdown("""
     .app-banner {
         background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
-        padding: 12px 14px;
-        border-radius: 14px;
+        padding: 10px 12px;
+        border-radius: 12px;
         box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
     .banner-icon {
-        font-size: 28px;
+        font-size: 24px;
         background: rgba(255, 255, 255, 0.2);
-        padding: 6px 10px;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .banner-text h3 {
         margin: 0;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
         letter-spacing: 0.3px;
     }
     .banner-text p {
         margin: 2px 0 0 0;
-        font-size: 11px;
+        font-size: 10.5px;
         opacity: 0.9;
     }
 
-    /* ÉP BẮT BUỘC CÁC CỘT TRONG STREAMLIT CHIA ĐỀU 3 CỘT / HÀNG TRÊN MỌI THIẾT BỊ */
+    /* ÉP BẮT BUỘC 3 CỘT TRÊN MỌI THIẾT BỊ DI ĐỘNG KHÔNG BỊ RỚT DÒNG */
+    div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 4px !important;
+    }
+
     div[data-testid="column"] {
-        width: 33.3333% !important;
-        flex: 1 1 33.3333% !important;
-        min-width: 33.3333% !important;
-        max-width: 33.3333% !important;
-        padding: 0 2px !important;
+        width: 33.333% !important;
+        flex: 1 1 33.333% !important;
+        min-width: 33.333% !important;
+        max-width: 33.333% !important;
+        padding: 0 1px !important;
     }
     
     /* Thiết kế nút bấm dịch vụ dạng thẻ bo tròn cân đối */
@@ -108,14 +115,14 @@ st.markdown("""
         background-color: #ffffff;
         color: #1e293b;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 8px 2px;
-        font-size: 11px;
+        border-radius: 10px;
+        padding: 7px 1px;
+        font-size: 10.5px;
         font-weight: 600;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -126,36 +133,52 @@ st.markdown("""
         color: #3b82f6;
     }
 
-    /* Nút Quay lại Trang chủ cực kỳ nhỏ gọn, sát lề trên, không che lấp nội dung */
-    div[data-testid="stButton"] > button[kind="secondary"] {
-        background-color: #f1f5f9 !important;
-        color: #475569 !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 8px !important;
-        font-size: 10.5px !important;
-        padding: 2px 8px !important;
-        font-weight: 500 !important;
-        width: auto !important;
-        margin-bottom: 4px !important;
+    /* KHU VỰC ĐIỀU HƯỚNG: NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM SÁT GỌN GÀNG */
+    .nav-header-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 8px;
+        gap: 8px;
     }
 
-    /* TIÊU ĐỀ TRANG SAU: CHUẨN 12px */
+    /* Nút Quay lại Trang chủ cực kỳ nhỏ gọn */
+    .nav-back-btn div[data-testid="stButton"] > button {
+        background-color: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        font-size: 10px !important;
+        padding: 2px 6px !important;
+        font-weight: 600 !important;
+        width: auto !important;
+        margin: 0 !important;
+    }
+
+    /* TIÊU ĐỀ TRANG SAU: GỌN GÀNG CÙNG HÀNG HOẶC LIỀN KỀ NÚT QUAY LẠI */
     h1 {
-        font-size: 14px !important;
+        font-size: 13px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
-        padding-bottom: 2px !important;
-        margin-bottom: 8px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-grow: 1;
+        text-align: right;
     }
+
     h2, h3 {
-        font-size: 12px !important;
+        font-size: 11px !important;
         font-weight: 600 !important;
         color: #334155 !important;
     }
 
-    /* NỘI DUNG VÀ BẢNG DỮ LIỆU: CHUẨN 11px GỌN GÀNG KHÍT MÀN HÌNH */
+    /* NỘI DUNG VÀ BẢNG DỮ LIỆU: CHUẨN 10.5px GỌN GÀNG KHÍT MÀN HÌNH */
     [data-testid="stDataFrame"] div, [data-testid="stDataEditor"] div, p, span, label, .streamlit-expanderHeader {
-        font-size: 11px !important;
+        font-size: 10.5px !important;
     }
     
     table {
@@ -163,7 +186,7 @@ st.markdown("""
     }
     
     input, select, textarea {
-        font-size: 11px !important;
+        font-size: 10.5px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -279,16 +302,40 @@ def navigate_to(page_name):
     st.session_state.current_page = page_name
     st.rerun()
 
-# --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH ---
+# --- ĐIỀU HƯỚNG GIAO DIỆN CHÍNH (NÚT QUAY LẠI VÀ TIÊU ĐỀ NẰM CHUNG 1 HÀNG GỌN GÀNG) ---
 if st.session_state.current_page != "Trang Chủ":
-    if st.button("⬅️ Quay lại Trang Chủ", key="btn_back_home"):
-        navigate_to("Trang Chủ")
-    st.markdown("---")
+    page_titles = {
+        "Bảng Tin": "📢 Bảng Tin & Thông Báo",
+        "Danh Bạ Thôn": "📋 Danh Bạ Cư Dân",
+        "Sự Kiện": "🎉 Sự Kiện Cộng Đồng",
+        "Công Khai Thu Chi": "💰 Công Khai Tài Chính",
+        "Đăng Ký Sự Kiện": "📝 Đăng Ký Sự Kiện",
+        "Phản Ánh Kiến Nghị": "⚠️ Gửi Phản Ánh",
+        "Vinh Danh Khen Thưởng": "🏆 Vinh Danh Khen Thưởng",
+        "Chợ Quê Nông Sản": "🛒 Chợ Quê Nông Sản",
+        "Đặt Lịch Nhà Văn Hóa": "📅 Đặt Lịch Văn Hóa",
+        "Khu Vực Quản Trị Cán Bộ": "🔐 Quản Trị Cán Bộ"
+    }
+    current_title = page_titles.get(st.session_state.current_page, st.session_state.current_page)
+    
+    st.markdown(f"""
+        <div class="nav-header-container">
+            <div class="nav-back-btn" id="back-btn-wrapper"></div>
+            <h1>{current_title}</h1>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Đặt nút Streamlit bên trong container wrapper bằng cách render đơn giản
+    col_back, _ = st.columns([1, 4])
+    with col_back:
+        if st.button("⬅️ Trang chủ", key="btn_back_home"):
+            navigate_to("Trang Chủ")
+    st.markdown("<div style='margin-bottom: 4px;'></div>", unsafe_allow_html=True)
 
 # ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
     
-    # Banner hiện đại bo tròn có hình ảnh/biểu tượng khu dân cư
+    # Banner hiện đại bo tròn
     st.markdown("""
         <div class="app-banner">
             <div class="banner-icon">🏡</div>
@@ -299,7 +346,7 @@ if st.session_state.current_page == "Trang Chủ":
         </div>
     """, unsafe_allow_html=True)
     
-    # --- DANH SÁCH NÚT DỊCH VỤ (LUÔN ĐẢM BẢO CHÍNH XÁC 3 CỘT / HÀNG) ---
+    # --- DANH SÁCH NÚT DỊCH VỤ (ÉP CỨNG CHUẨN 3 NÚT / HÀNG) ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
@@ -332,7 +379,6 @@ if st.session_state.current_page == "Trang Chủ":
 # ================= CHI TIẾT CÁC TÍNH NĂNG =================
 
 elif st.session_state.current_page == "Bảng Tin":
-    st.header("📢 Bảng Tin & Thông Báo")
     df_tb = load_excel_data("ThongBao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
@@ -344,22 +390,18 @@ elif st.session_state.current_page == "Bảng Tin":
         st.info("Chưa có thông báo nào.")
 
 elif st.session_state.current_page == "Danh Bạ Thôn":
-    st.header("📋 Danh Bạ Cư Dân & Cán Bộ Thôn")
     df_db = load_excel_data("DanhBaThon")
     display_df_with_1_index(df_db)
 
 elif st.session_state.current_page == "Sự Kiện":
-    st.header("🎉 Sự Kiện Cộng Đồng")
     df_sk_hien_thi = get_updated_events_df()
     display_df_with_1_index(df_sk_hien_thi)
 
 elif st.session_state.current_page == "Công Khai Thu Chi":
-    st.header("💰 Công Khai Tài Chính Quỹ Thôn")
     df_tc = load_excel_data("CongKhaiThuChi")
     display_df_with_1_index(df_tc)
 
 elif st.session_state.current_page == "Đăng Ký Sự Kiện":
-    st.header("📝 Đăng Ký Hoạt Động & Điểm Danh")
     df_sk = load_excel_data("SuKien")
     df_sk_hien_thi = get_updated_events_df()
     
@@ -393,7 +435,6 @@ elif st.session_state.current_page == "Đăng Ký Sự Kiện":
                     st.rerun()
 
 elif st.session_state.current_page == "Phản Ánh Kiến Nghị":
-    st.header("⚠️ Gửi Phản Ánh & Kiến Nghị")
     with st.form("form_phan_anh", clear_on_submit=True):
         nguoi_gui = st.text_input("Họ và tên của bạn")
         linh_vuc_pa = st.selectbox("Lĩnh vực", ["Môi trường", "An ninh trật tự", "Hạ tầng / Đường xá", "Tranh chấp", "Khác"])
@@ -416,12 +457,10 @@ elif st.session_state.current_page == "Phản Ánh Kiến Nghị":
                     st.success("Phản ánh của bạn đã được gửi thành công đến cán bộ thôn!")
 
 elif st.session_state.current_page == "Vinh Danh Khen Thưởng":
-    st.header("🏆 Vinh Danh & Khen Thưởng Cư Dân")
     df_vd = load_excel_data("VinhDanh")
     display_df_with_1_index(df_vd)
 
 elif st.session_state.current_page == "Chợ Quê Nông Sản":
-    st.header("🛒 Chợ Quê — Trao Đổi Nông Sản")
     tab_xem, tab_dang = st.tabs(["🛍️ Xem nông sản", "➕ Đăng bán sản phẩm"])
     with tab_xem:
         df_cq = load_excel_data("ChoQue")
@@ -451,7 +490,6 @@ elif st.session_state.current_page == "Chợ Quê Nông Sản":
                         st.rerun()
 
 elif st.session_state.current_page == "Đặt Lịch Nhà Văn Hóa":
-    st.header("📅 Đặt Lịch Sử Dụng Nhà Văn Hóa")
     df_dl = load_excel_data("DatLichNhaVanHoa")
     display_df_with_1_index(df_dl)
     with st.form("form_dat_lich", clear_on_submit=True):
@@ -475,7 +513,6 @@ elif st.session_state.current_page == "Đặt Lịch Nhà Văn Hóa":
                     st.success("Yêu cầu đặt lịch đã được gửi thành công.")
 
 elif st.session_state.current_page == "Khu Vực Quản Trị Cán Bộ":
-    st.header("🔐 Khu Vực Quản Trị Cán Bộ Thôn")
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
 
