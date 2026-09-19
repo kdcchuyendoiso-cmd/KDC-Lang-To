@@ -786,88 +786,18 @@ def page_admin() -> None:
 
     sheet = ADMIN_SECTIONS[choice]
     data, config = admin_editor_data(sheet)
-    # st.caption("Bấm vào ô để sửa...") -> Dùng dấu # ở đầu để ẩn dòng này đi mà không làm lỗi code
+    
+    # st.caption("Bấm vào ô để sửa...")
     edited = st.data_editor(data, num_rows="dynamic", hide_index=True, column_config=config, key=f"ed_{sheet}")
-    if st.button("💾 Lưu thay đổi", key=f"save_{sheet}"):
-        try:
-            db.write_sheet(sheet, edited)
-        except Exception as exc:
-            st.error(f"Chưa lưu được: {exc}")
-        else:
-            flash("success", f"Đã lưu mục '{choice}'.")
-            st.rerun()
-
-
-# =====================================================================
-# Trang chủ
-# =====================================================================
-def page_home() -> None:
-    news = sorted_news(load("ThongBao"))
-    n_news = len(news)
-    n_events = len(load("SuKien"))
-    n_contacts = len(load("DanhBaThon"))
-
-    html_block("""
-    <div style="display: flex; align-items: center; gap: 16px; padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 16px; color: white;">
-        <div style="font-size: 48px; line-height: 1;">🏠</div>
-        <div style="text-align: center; flex: 1;">
-            <h2 style="margin: 0; font-size: 16px; font-weight: bold;">Thôn Lăng Tô</h2>
-            <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">Quản lý & điều hành</p>
-        </div>
-    </div>
-""")
-
-    tiles = "".join(
-        f'<a class="tile" href="{link(p.slug)}" target="_self">'
-        f'<span class="ico" style="background:{p.bg};color:{p.fg}">{p.icon}</span>'
-        f'<span class="lbl">{esc(p.short)}</span></a>'
-        for p in (PAGES[s] for s in TILE_SLUGS)
-    )
-    html_block(f'<div class="grid3">{tiles}</div>')
-
-    if not news.empty:
-        html_block(f'<div class="sec"><b>Tin mới nhất</b><a href="{link("bang-tin")}" target="_self">Xem tất cả</a></div>')
-        html_block(news_card(news.iloc[0]))
-
-    html_block(
-        f'<div class="admin-link"><a href="{link("quan-tri")}" target="_self">🔐 Khu vực cán bộ</a></div>'
-        '<div class="tip">Ứng dụng chuyển đổi số V1.0.</div>'
-    )
-
-
-# =====================================================================
-# Điều hướng
-# =====================================================================
-ROUTES = {
-    "bang-tin": page_news,
-    "danh-ba": page_contacts,
-    "su-kien": page_events,
-    "thu-chi": page_finance,
-    "dang-ky": page_register,
-    "phan-anh": page_feedback,
-    "vinh-danh": page_honors,
-    "cho-que": page_market,
-    "dat-lich": page_booking,
-    "quan-tri": page_admin,
-}
-
-
-def current_slug() -> str:
-    slug = st.query_params.get("page", "home")
-    return slug if slug in ROUTES else "home"
-
-
-def main() -> None:
-    st.markdown("<style>" + APP_CSS + "</style>", unsafe_allow_html=True)
-    slug = current_slug()
-    if slug == "home":
-        show_flash()
-        page_home()
-    else:
-        page_header(PAGES[slug])
-        show_flash()
-        ROUTES[slug]()
-    bottom_nav(slug)
-
-
-main()
+    
+    # VỊ TRÍ PHÙ HỢP ĐỂ THÊM NÚT LƯU VÀ XỬ LÝ DỮ LIỆU
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("💾 Lưu thay đổi", type="primary", use_container_width=True):
+            try:
+                db.write_sheet(sheet, edited)
+            except Exception as exc:
+                st.error(f"Lỗi khi lưu dữ liệu: {exc}")
+            else:
+                flash("success", "Đã lưu thay đổi thành công!")
+                st.rerun()
