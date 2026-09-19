@@ -45,85 +45,127 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS GIAO DIỆN TỐI ƯU MOBILE (3 NÚT 1 HÀNG & FULL MÀN HÌNH NỘI DUNG) ---
+# --- CSS GIAO DIỆN TỐI ƯU MOBILE & TÙY CHỈNH KÍCH THƯỚC NỘI DUNG ---
 st.markdown("""
 <style>
-    /* Ép bố cục Streamlit sử dụng tối đa chiều rộng màn hình điện thoại */
+    /* Ép bố cục Streamlit tối ưu chiều rộng màn hình điện thoại */
     .block-container {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-        padding-top: 1.5rem !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 1rem !important;
         max-width: 100% !important;
     }
 
     /* Tổng thể nền trang */
     .stApp {
-        background-color: #f4f6f9;
+        background-color: #f8fafc;
     }
     
-    /* Header biểu ngữ đỏ - căn giữa */
+    /* Banner sang trọng màu xanh dương đậm (Professional Blue) + Bo tròn + Biểu tượng khu dân cư */
     .app-banner {
-        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         color: white;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
-        margin-bottom: 20px;
-        text-align: center;
+        padding: 14px 16px;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.25);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
-    .app-banner h3 {
+    .banner-icon {
+        font-size: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .banner-text h3 {
         margin: 0;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 700;
         letter-spacing: 0.5px;
     }
-    .app-banner p {
-        margin: 4px 0 0 0;
-        font-size: 12px;
-        opacity: 0.95;
+    .banner-text p {
+        margin: 2px 0 0 0;
+        font-size: 11.5px;
+        opacity: 0.9;
     }
 
-    /* Cố định các cột trong Streamlit không bị rớt dòng trên màn hình nhỏ (Giữ đúng 3 nút 1 hàng trên điện thoại) */
+    /* Cố định 3 cột dịch vụ trên mọi màn hình */
     [data-testid="column"] {
-        width: calc(33.333% - 0.5rem) !important;
-        flex: 1 1 calc(33.333% - 0.5rem) !important;
-        min-width: calc(33.333% - 0.5rem) !important;
-        padding: 0 3px !important;
+        width: calc(33.333% - 0.4rem) !important;
+        flex: 1 1 calc(33.333% - 0.4rem) !important;
+        min-width: calc(33.333% - 0.4rem) !important;
+        padding: 0 2px !important;
     }
     
     /* Nút bấm dịch vụ dạng thẻ bo tròn gọn gàng */
     .stButton button {
         width: 100% !important;
         background-color: white;
-        color: #333;
-        border: 1px solid #e0e0e0;
-        border-radius: 20px;
-        padding: 8px 4px;
-        font-size: 11.5px;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 8px 2px;
+        font-size: 11px;
         font-weight: 600;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     
     .stButton button:hover {
-        border-color: #d32f2f;
-        color: #d32f2f;
-        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.15);
-        transform: translateY(-1px);
+        border-color: #3b82f6;
+        color: #3b82f6;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15);
     }
 
-    /* Thu nhỏ chữ dataframe và tối ưu hiển thị full màn hình mobile */
-    [data-testid="stDataFrame"] div, [data-testid="stDataEditor"] div {
-        font-size: 12px !important;
+    /* Tinh chỉnh nút Quay lại Trang chủ nhỏ gọn, tinh tế, không bị che lấp */
+    div[data-testid="stButton"] > button[kind="secondary"] {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+        font-weight: 500 !important;
+        width: auto !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* TIÊU ĐỀ CÁC TRANG SAU: CHUẨN 12px */
+    h1 {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        padding-bottom: 4px !important;
+        margin-bottom: 10px !important;
+    }
+    h2, h3 {
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+    }
+
+    /* NỘI DUNG VÀ BẢNG DỮ LIỆU TRANG SAU: CHUẨN 11px, FULL MÀN HÌNH */
+    [data-testid="stDataFrame"] div, [data-testid="stDataEditor"] div, p, span, label, .streamlit-expanderHeader {
+        font-size: 11px !important;
     }
     
     table {
         width: 100% !important;
+    }
+    
+    /* Chỉnh kích thước ô nhập liệu form form-input vừa vặn trên điện thoại */
+    input, select, textarea {
+        font-size: 11px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -248,15 +290,18 @@ if st.session_state.current_page != "Trang Chủ":
 # ================= TRANG CHỦ =================
 if st.session_state.current_page == "Trang Chủ":
     
-    # Banner căn giữa
+    # Banner hiện đại bo tròn có hình ảnh/biểu tượng khu dân cư
     st.markdown("""
         <div class="app-banner">
-            <h3>KHU DÂN CƯ LĂNG TÔ</h3>
-            <p>Quản Lý Cộng Đồng</p>
+            <div class="banner-icon">🏡</div>
+            <div class="banner-text">
+                <h3>KHU DÂN CƯ LĂNG TÔ</h3>
+                <p>Cổng Thông Tin Quản Lý Cộng Đồng Thông Minh</p>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # --- DANH SÁCH NÚT DỊCH VỤ (BỐ TRÍ 3 CỘT / HÀNG CẢ TRÊN MOBILE) ---
+    # --- DANH SÁCH NÚT DỊCH VỤ (3 CỘT / HÀNG TRÊN MOBILE) ---
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📢 Bảng Tin", use_container_width=True): navigate_to("Bảng Tin")
@@ -293,10 +338,10 @@ elif st.session_state.current_page == "Bảng Tin":
     df_tb = load_excel_data("ThongBao")
     if not df_tb.empty:
         for idx, row in df_tb.iterrows():
-            ghim = "📌 [Ghim Nổi Bật]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
-            with st.expander(f"{ghim} {row.get('Tiêu Đề', 'Thông báo')} (Phân loại: {row.get('Phân Loại', 'Chung')})"):
+            ghim = "📌 [Ghim]" if str(row.get('Ghim Nổi Bật', '')) == "Có" else ""
+            with st.expander(f"{ghim} {row.get('Tiêu Đề', 'Thông báo')} (Loại: {row.get('Phân Loại', 'Chung')})"):
                 st.write(f"**Nội dung:** {row.get('Nội Dung', '')}")
-                st.write(f"📅 Ngày đăng: {row.get('Ngày Đăng', '')} | 👤 Người đăng: {row.get('Người Đăng', '')}")
+                st.write(f"📅 Ngày: {row.get('Ngày Đăng', '')} | 👤 Đăng bởi: {row.get('Người Đăng', '')}")
     else:
         st.info("Chưa có thông báo nào.")
 
