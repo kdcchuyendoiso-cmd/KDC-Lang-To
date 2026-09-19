@@ -45,14 +45,14 @@ def init_excel_file():
 
 init_excel_file()
 
-# --- CSS TỐI ƯU GIAO DIỆN DI ĐỘNG: 3 NÚT 1 HÀNG KHÍT MÀN HÌNH ---
+# --- CSS ÉP CỨNG CHUẨN 3 NÚT NẰM NGANG KHÍT MÀN HÌNH ĐIỆN THOẠI ---
 st.markdown("""
 <style>
-    /* Ép toàn bộ container vừa vặn màn hình điện thoại, chống tràn */
+    /* Ép container full màn hình, chống tràn viền */
     .block-container {
-        padding-left: 0.3rem !important;
-        padding-right: 0.3rem !important;
-        padding-top: 0.3rem !important;
+        padding-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
+        padding-top: 0.4rem !important;
         max-width: 100% !important;
     }
 
@@ -93,12 +93,12 @@ st.markdown("""
         opacity: 0.9;
     }
 
-    /* ÉP CỨNG CHUẨN 3 CỘT / HÀNG NGANG TRÊN MỌI THIẾT BỊ DI ĐỘNG */
+    /* ÉP BẮT BUỘC KHÔNG BỊ XUỐNG DÒNG: 3 NÚT ĐỨNG CÙNG 1 HÀNG NGANG TRÊN ĐIỆN THOẠI */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 2px !important;
+        gap: 4px !important;
         width: 100% !important;
     }
 
@@ -107,23 +107,23 @@ st.markdown("""
         flex: 1 1 33.333% !important;
         min-width: 33.333% !important;
         max-width: 33.333% !important;
-        padding: 0 1px !important;
+        padding: 0 !important;
     }
     
-    /* Thiết kế nút bấm dịch vụ: thu gọn padding để vừa khít 3 nút trên màn hình dọc */
+    /* Thiết kế nút bấm dịch vụ: kích thước vừa vặn cho 3 nút trên 1 hàng */
     .stButton button {
         width: 100% !important;
         background-color: #ffffff;
         color: #1e293b;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
-        padding: 5px 1px !important;
-        font-size: 9.5px !important;
+        padding: 6px 2px !important;
+        font-size: 10px !important;
         font-weight: 600;
         box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         transition: all 0.2s ease;
         text-align: center;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -140,7 +140,7 @@ st.markdown("""
         color: #334155 !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 6px !important;
-        font-size: 9.5px !important;
+        font-size: 10px !important;
         padding: 2px 6px !important;
         font-weight: 600 !important;
         width: auto !important;
@@ -148,14 +148,14 @@ st.markdown("""
     }
 
     .nav-title-text {
-        font-size: 11.5px !important;
+        font-size: 12px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
         margin: 0 !important;
         text-align: right;
     }
 
-    /* NỘI DUNG VÀ BẢNG DỮ LIỆU: TIÊU ĐỀ 12px, NỘI DUNG 11px */
+    /* TIÊU ĐỀ VÀ NỘI DUNG TRANG SAU */
     h1 {
         font-size: 12px !important;
     }
