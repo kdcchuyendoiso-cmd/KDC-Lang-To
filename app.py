@@ -819,25 +819,32 @@ def page_admin() -> None:
 # Trang chủ
 # =====================================================================
 def page_home() -> None:
-    news = sorted_news(load("ThongBao"))
-    n_news = len(news)
-    n_events = len(load("SuKien"))
-    n_contacts = len(load("DanhBaThon"))
-
     html_block(
-        f"""
-        <div class="hero">
-          <div class="hero-mark">🏡</div>
-          <div class="hero-title">Khu dân cư Lăng Tô</div>
-          <div class="hero-sub">Thông tin, sự kiện và tiếng nói của bà con trong khu dân cư.</div>
-          <div class="chips">
-            <a class="chip" href="{link('bang-tin')}" target="_self">📢 {n_news} thông báo</a>
-            <a class="chip" href="{link('su-kien')}" target="_self">🎉 {n_events} sự kiện</a>
-            <a class="chip" href="{link('danh-ba')}" target="_self">📋 {n_contacts} liên hệ</a>
+        """
+        <div class="home-hero">
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 4px;">
+            <div style="font-size: 32px; line-height: 1;">🏠</div>
+            <div class="hh-title" style="margin-bottom: 0;">Khu dân cư Lăng Tô</div>
           </div>
+          <div class="hh-sub" style="text-align: left; padding-left: 46px;">Thông tin, sự kiện và tiếng nói của bà con trong khu dân cư.</div>
         </div>
         """
     )
+    cols = st.columns(2)
+    for i, slug in enumerate(TILE_SLUGS):
+        p = PAGES[slug]
+        with cols[i % 2]:
+            html_block(
+                f"""
+                <a class="tile" href="{link(slug)}" target="_self">
+                  <div class="tile-icon" style="background:{p.bg}; color:{p.fg}">{p.icon}</div>
+                  <div class="tile-text">
+                    <div class="tile-title">{esc(p.short)}</div>
+                    <div class="tile-sub">{esc(p.title)}</div>
+                  </div>
+                </a>
+                """
+            )
 
     tiles = "".join(
         f'<a class="tile" href="{link(p.slug)}" target="_self">'
