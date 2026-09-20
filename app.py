@@ -831,11 +831,11 @@ def page_home() -> None:
             <div class="hero-mark" style="margin-bottom: 0;">🏡</div>
             <div class="hero-title" style="margin-bottom: 0;">Khu dân cư Lăng Tô</div>
           </div>
-          <div class="hero-sub">Thông tin và điều hành khu dân cư.</div>
+          <div class="hero-sub">Trang thông tin và điều hành.</div>
           <div class="chips">
             <a class="chip" href="{link('bang-tin')}" target="_self">📢 {n_news} thông báo</a>
             <a class="chip" href="{link('su-kien')}" target="_self">🎉 {n_events} sự kiện</a>
-            #<a class="chip" href="{link('danh-ba')}" target="_self">📋 {n_contacts} liên hệ</a>
+            <a class="chip" href="{link('danh-ba')}" target="_self">📋 {n_contacts} liên hệ</a>
           </div>
         </div>
         """
