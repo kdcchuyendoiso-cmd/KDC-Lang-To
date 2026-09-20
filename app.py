@@ -829,7 +829,7 @@ def page_home() -> None:
         <div class="hero">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
             <div class="hero-mark" style="margin-bottom: 0;">🏡</div>
-            <div class="hero-title" style="margin-bottom: 0;">Khu dân cư Lăng Tô</div>
+            <div class="hero-title" style="margin-bottom: 0;font-size: 22px;">Khu dân cư Lăng Tô</div>
           </div>
           <div class="hero-sub">Trang thông tin và điều hành.</div>
           <div class="chips">
