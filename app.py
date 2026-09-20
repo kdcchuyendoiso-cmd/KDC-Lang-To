@@ -819,7 +819,12 @@ def page_admin() -> None:
 # Trang chủ
 # =====================================================================
 def page_home() -> None:
-       html_block(
+    news = sorted_news(load("ThongBao"))
+    n_news = len(news)
+    n_events = len(load("SuKien"))
+    n_contacts = len(load("DanhBaThon"))
+
+    html_block(
         f"""
         <div class="hero">
           <div class="hero-mark">🏡</div>
@@ -833,22 +838,6 @@ def page_home() -> None:
         </div>
         """
     )
-
-    cols = st.columns(2)
-    for i, slug in enumerate(TILE_SLUGS):
-        p = PAGES[slug]
-        with cols[i % 2]:
-            html_block(
-                f"""
-                <a class="tile" href="{link(slug)}" target="_self">
-                  <div class="tile-icon" style="background:{p.bg}; color:{p.fg}">{p.icon}</div>
-                  <div class="tile-text">
-                    <div class="tile-title">{esc(p.short)}</div>
-                    <div class="tile-sub">{esc(p.title)}</div>
-                  </div>
-                </a>
-                """
-            )
 
     tiles = "".join(
         f'<a class="tile" href="{link(p.slug)}" target="_self">'
