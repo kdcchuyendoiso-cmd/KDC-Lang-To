@@ -827,8 +827,10 @@ def page_home() -> None:
     html_block(
         f"""
         <div class="hero">
-          <div class="hero-mark">🏡</div>
-          <div class="hero-title">Khu dân cư Lăng Tô</div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+            <div class="hero-mark" style="margin-bottom: 0;">🏡</div>
+            <div class="hero-title" style="margin-bottom: 0;">Khu dân cư Lăng Tô</div>
+          </div>
           <div class="hero-sub">Thông tin, sự kiện và tiếng nói của bà con trong khu dân cư.</div>
           <div class="chips">
             <a class="chip" href="{link('bang-tin')}" target="_self">📢 {n_news} thông báo</a>
