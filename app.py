@@ -819,12 +819,7 @@ def page_admin() -> None:
 # Trang chủ
 # =====================================================================
 def page_home() -> None:
-    news = sorted_news(load("ThongBao"))
-    n_news = len(news)
-    n_events = len(load("SuKien"))
-    n_contacts = len(load("DanhBaThon"))
-
-    html_block(
+       html_block(
         f"""
         <div class="hero">
           <div class="hero-mark">🏡</div>
