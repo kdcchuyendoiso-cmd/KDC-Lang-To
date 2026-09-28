@@ -35,13 +35,16 @@ function BackupPanel() {
 
 export default async function Page({ searchParams }) {
   const admin = isAdmin();
-  const sheet = searchParams?.sheet || "thongbao";
+  
+  // ⭐️ ĐÃ SỬA: Await searchParams để tương thích hoàn toàn với Next.js mới
+  const sp = await searchParams;
+  const sheet = sp?.sheet || "thongbao";
 
   return (
     <>
       <PageHeader page={PAGES["quan-tri"]} />
-      {searchParams?.error ? <div className="alert error">{decodeURIComponent(searchParams.error)}</div> : null}
-      <Flash searchParams={searchParams} />
+      {sp?.error ? <div className="alert error">{decodeURIComponent(sp.error)}</div> : null}
+      <Flash searchParams={sp} />
 
       {!admin ? (
         <form className="form-card" action={loginAction}>
