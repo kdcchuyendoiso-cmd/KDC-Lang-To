@@ -1,18 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { TABLE_ORDER, TABLES } from "@/lib/schema";
 
 export default function AdminPicker({ current }) {
-  const router = useRouter();
   return (
     <select
       className="admin-select"
       value={current}
       onChange={(e) => {
         const value = e.target.value;
-        router.push(`/quan-tri?sheet=${value}`);
-        router.refresh();
+        // Dùng window.location.href để ép tải lại hoàn toàn, loại bỏ triệt để cache cũ của Next.js
+        window.location.href = `/quan-tri?sheet=${value}`;
       }}
     >
       {TABLE_ORDER.map((t) => (
