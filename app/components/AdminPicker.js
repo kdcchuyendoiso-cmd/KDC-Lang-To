@@ -9,7 +9,11 @@ export default function AdminPicker({ current }) {
     <select
       className="admin-select"
       value={current}
-      onChange={(e) => router.push(`/quan-tri?sheet=${e.target.value}`)}
+      onChange={(e) => {
+        const value = e.target.value;
+        router.push(`/quan-tri?sheet=${value}`);
+        router.refresh();
+      }}
     >
       {TABLE_ORDER.map((t) => (
         <option key={t} value={t}>
