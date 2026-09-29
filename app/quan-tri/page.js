@@ -3,6 +3,7 @@ import { PAGES } from "@/lib/pages-config";
 import { Flash, PageHeader } from "@/app/components/ui";
 import AdminPicker from "@/app/components/AdminPicker";
 import AdminSheetEditor from "@/app/components/AdminSheetEditor";
+import AdminSummaryView from "@/app/components/AdminSummaryView";
 import { loginAction, logoutAction, restoreAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +37,7 @@ function BackupPanel() {
 export default async function Page({ searchParams }) {
   const admin = isAdmin();
   
-  // ⭐️ ĐÃ SỬA: Await searchParams để tương thích hoàn toàn với Next.js mới
+  // Await searchParams để tương thích hoàn toàn với Next.js mới
   const sp = await searchParams;
   const sheet = sp?.sheet || "thongbao";
 
@@ -71,7 +72,20 @@ export default async function Page({ searchParams }) {
 
           <AdminPicker current={sheet} />
 
-          {sheet === "backup" ? <BackupPanel /> : <AdminSheetEditor table={sheet} />}
+          {sheet === "backup" ? (
+            <BackupPanel />
+          ) : sheet === "dang_ky" ? (
+            <>
+              {/* Hiển thị bảng tổng hợp thống kê đăng ký họp & bình xét */}
+              <AdminSummaryView />
+              <div className="sec">
+                <b>Chỉnh sửa chi tiết danh sách đăng ký</b>
+              </div>
+              <AdminSheetEditor key={sheet} table={sheet} />
+            </>
+          ) : (
+            <AdminSheetEditor key={sheet} table={sheet} />
+          )}
         </>
       )}
     </>
