@@ -3,7 +3,7 @@ import { PAGES } from "@/lib/pages-config";
 import { Flash, PageHeader } from "@/app/components/ui";
 import AdminPicker from "@/app/components/AdminPicker";
 import AdminSheetEditor from "@/app/components/AdminSheetEditor";
-import AdminSummaryView from "@/AdminSummaryView";
+import AdminSummaryView from "@/app/components/AdminSummaryView";
 import { loginAction, logoutAction, restoreAction } from "./actions";
 
 export const dynamic = "force-dynamic";
