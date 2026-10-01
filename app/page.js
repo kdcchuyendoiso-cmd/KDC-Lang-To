@@ -4,7 +4,9 @@ import { isYes, parseDate, showDate } from "@/lib/helpers";
 import { PAGES, TILE_SLUGS } from "@/lib/pages-config";
 import { Flash } from "@/app/components/ui";
 
+// ⭐️️ Cấu hình ép buộc render động và không lưu cache (luôn lấy dữ liệu mới nhất từ DB)
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function sortNews(rows) {
   return [...rows].sort((a, b) => {
@@ -34,6 +36,7 @@ export default async function HomePage({ searchParams }) {
           <div className="hero-mark">🏡</div>
           <div className="hero-title">Khu dân cư Lăng Tô</div>
         </div>
+        {/* ⭐️ Đã sửa đổi dòng chữ tiêu đề phụ theo ý bạn */}
         <div className="hero-sub">Phiên bản thử nghiệm.</div>
         <div className="chips">
           <Link className="chip" href="/bang-tin">
@@ -75,7 +78,7 @@ export default async function HomePage({ searchParams }) {
       <div className="tip">
         Mẹo: mở menu trình duyệt và chọn “Thêm vào màn hình chính” để dùng như một ứng dụng.
       </div>
-      <div style={{ height: 0 }}>{contacts.length /* giữ dữ liệu đã tải, tránh cảnh báo lint không dùng */}</div>
+      <div style={{ height: 0 }}>{contacts.length}</div>
     </>
   );
 }
