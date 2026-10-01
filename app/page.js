@@ -34,7 +34,7 @@ export default async function HomePage({ searchParams }) {
           <div className="hero-mark">🏡</div>
           <div className="hero-title">Khu dân cư Lăng Tô</div>
         </div>
-        <div className="hero-sub">Trang thông tin và điều hành (chạy thử nghiệm).</div>
+        <div className="hero-sub">Trang thông tin và điều hành.</div>
         <div className="chips">
           <Link className="chip" href="/bang-tin">
             📢 {news.length} thông báo
